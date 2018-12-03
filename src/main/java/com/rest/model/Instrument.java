@@ -1,5 +1,8 @@
 package com.rest.model;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
@@ -55,5 +58,16 @@ public class Instrument implements Serializable {
         this.description = description;
     }
 
+    public JSONObject getJSON() {
+        JSONObject res = new JSONObject();
+        try {
+            res.put("InstrID",   getInstrument_id());
+            res.put("InstrCode", getName());
+            res.put("Desciption",getDescription());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 
 }

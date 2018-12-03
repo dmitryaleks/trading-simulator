@@ -23,6 +23,7 @@
 
         <!-- Annotated entity classes -->
         <mapping class="com.rest.model.Orders"/>
+        <mapping class="com.rest.model.Instrument"/>
 
     </session-factory>
 </hibernate-configuration>

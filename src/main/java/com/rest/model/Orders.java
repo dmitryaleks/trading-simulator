@@ -1,12 +1,18 @@
 package com.rest.model;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Orders implements Serializable {
 
     @Id
+    @Column(name = "order_id", columnDefinition = "serial")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int order_id;
 
     private int version;
@@ -14,6 +20,9 @@ public class Orders implements Serializable {
     private double price;
     private double quantity;
     private String notes;
+    public Orders() {
+
+    }
 
     public Orders(int version, int inst_id, double price, double quantity, String notes) {
         this.version = version;
@@ -69,6 +78,20 @@ public class Orders implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public JSONObject getJSON() {
+        JSONObject res = new JSONObject();
+        try {
+            res.put("OrderID", getOrderID());
+            res.put("Quantity",getQuantity());
+            res.put("Price",   getPrice());
+            res.put("InstrID", getInst_id());
+            res.put("Notes",   getNotes());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
 }
