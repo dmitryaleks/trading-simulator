@@ -2,6 +2,7 @@ package com.rest.util;
 
 import com.rest.model.Instrument;
 import com.rest.model.Orders;
+import com.rest.session.SessionManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,9 +23,7 @@ public class OrderManager {
 
     public static Orders getInstrument(final String orderID) throws OrderLookupException {
 
-        SessionFactory sessionFactory = new Configuration().configure()
-                .buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = SessionManager.getSessionFactory().openSession();
         final String getInstrHQL = String.format("SELECT O FROM Orders O WHERE O.order_id = '%s'", orderID);
         Query query = session.createQuery(getInstrHQL);
         List<Orders> orders = query.list();
@@ -43,9 +42,7 @@ public class OrderManager {
 
     public static List<Orders> getAllOrders() throws OrderLookupException {
 
-        SessionFactory sessionFactory = new Configuration().configure()
-                .buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = SessionManager.getSessionFactory().openSession();
         final String getInstrHQL = "SELECT O FROM Orders O";
         Query query = session.createQuery(getInstrHQL);
         List<Orders> orders = query.list();

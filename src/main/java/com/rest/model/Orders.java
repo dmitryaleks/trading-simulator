@@ -1,8 +1,7 @@
 package com.rest.model;
+import com.rest.util.InstrumentManager;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -88,6 +87,11 @@ public class Orders implements Serializable {
             res.put("Price",   getPrice());
             res.put("InstrID", getInst_id());
             res.put("Notes",   getNotes());
+            try {
+                res.put("InstrCode", InstrumentManager.getInstrumentById(getInst_id()).getName());
+            } catch (InstrumentManager.InstrumentLookupException e) {
+                e.printStackTrace();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
