@@ -19,6 +19,7 @@ public class Orders implements Serializable {
     private double price;
     private double quantity;
     private String notes;
+
     public Orders() {
 
     }
@@ -87,11 +88,6 @@ public class Orders implements Serializable {
             res.put("Price",   getPrice());
             res.put("InstrID", getInst_id());
             res.put("Notes",   getNotes());
-            try {
-                res.put("InstrCode", InstrumentManager.getInstrumentById(getInst_id()).getName());
-            } catch (InstrumentManager.InstrumentLookupException e) {
-                e.printStackTrace();
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

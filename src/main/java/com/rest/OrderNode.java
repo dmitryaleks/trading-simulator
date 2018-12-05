@@ -28,9 +28,9 @@ public class OrderNode {
     public Response get(@DefaultValue("6758.T") @QueryParam("instCode") String instCode) {
 
         try {
-            List<Orders> orders = OrderManager.getAllOrders();
+            List<JSONObject> orders = OrderManager.getAllOrders();
             JSONArray res = new JSONArray();
-            orders.stream().forEach(inst -> res.put(inst.getJSON()));
+            orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();
         } catch (final OrderManager.OrderLookupException ex) {
             ex.printStackTrace();
