@@ -46,7 +46,7 @@ public class OrderManager {
     public static List<JSONObject> getAllOrders() throws OrderLookupException {
 
         Session session = SessionManager.getSessionFactory().openSession();
-        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id");
+        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.order_id");
         Query query = session.createQuery(getInstrHQL);
         List<Object[]> res = query.list();
         session.close();

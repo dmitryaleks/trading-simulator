@@ -3,6 +3,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.Serializable;
+import java.sql.Date;
 import javax.persistence.*;
 
 @Entity
@@ -13,22 +14,30 @@ public class Orders implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int order_id;
 
+    private Date timestamp;
     private int version;
     private int inst_id;
     private double price;
     private double quantity;
     private String notes;
+    private String side;
+    private double quantity_filled;
+    private String status;
 
     public Orders() {
 
     }
 
-    public Orders(int version, int inst_id, double price, double quantity, String notes) {
+    public Orders(int version, int inst_id, String side, double price, double quantity, String notes) {
         this.version = version;
         this.inst_id = inst_id;
         this.price = price;
         this.quantity = quantity;
         this.notes = notes;
+        this.side = side;
+        this.status = "A";
+        this.quantity_filled = 0;
+        this.timestamp = new Date(new java.util.Date().getTime());
     }
 
     public double getPrice() {
@@ -79,6 +88,38 @@ public class Orders implements Serializable {
         this.notes = notes;
     }
 
+    public String getSide() {
+        return side;
+    }
+
+    public void setSide(String side) {
+        this.side = side;
+    }
+
+    public double getQuantity_filled() {
+        return quantity_filled;
+    }
+
+    public void setQuantity_filled(double quantity_filled) {
+        this.quantity_filled = quantity_filled;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public JSONObject getJSON() {
         JSONObject res = new JSONObject();
         try {
@@ -87,6 +128,10 @@ public class Orders implements Serializable {
             res.put("Price",   getPrice());
             res.put("InstrID", getInst_id());
             res.put("Notes",   getNotes());
+            res.put("Side",    getSide());
+            res.put("QuantityFilled", getQuantity_filled());
+            res.put("Status",  getStatus());
+            res.put("Timestamp", getTimestamp());
         } catch (JSONException e) {
             e.printStackTrace();
         }

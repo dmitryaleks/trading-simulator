@@ -54,12 +54,11 @@ public class OrderNode {
         }
 
         Double price = Double.valueOf(req.optString("price"));
-        System.out.println(req.optString("price"));
         Double quantity = Double.valueOf(req.optString("quantity"));
-        System.out.println(req.optString("quantity"));
 
         String instCode = req.optString("instCode");
         String notes = req.optString("notes");
+        String side = req.optString("side");
 
         int instID = 0;
         try {
@@ -72,7 +71,7 @@ public class OrderNode {
         Session session = SessionManager.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Orders ord = new Orders(1, instID, price, quantity, notes);
+        Orders ord = new Orders(1, instID, side, price, quantity, notes);
         session.save(ord);
         session.getTransaction().commit();
         session.close();

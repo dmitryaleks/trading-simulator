@@ -221,6 +221,18 @@ SELECT * FROM orders INNER JOIN instrument ON instrument.instrument_id=orders.in
 (1 row)
 ```
 
+To change table schema:
+
+```
+ALTER TABLE orders ADD COLUMN side char;
+```
+
+Update existing data:
+
+```
+UPDATE orders SET quantity_filled=0;
+```
+
 ## Notes on Hibernate
 
 ### Setup with Maven
