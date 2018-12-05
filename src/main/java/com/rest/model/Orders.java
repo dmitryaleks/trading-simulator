@@ -1,5 +1,4 @@
 package com.rest.model;
-import com.rest.util.InstrumentManager;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 

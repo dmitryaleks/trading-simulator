@@ -1,6 +1,7 @@
 package com.rest;
 
 import com.rest.model.Orders;
+import com.rest.session.SessionManager;
 import com.rest.util.InstrumentManager;
 import com.rest.util.OrderManager;
 import org.codehaus.jettison.json.JSONArray;
@@ -68,10 +69,7 @@ public class OrderNode {
             return Response.status(400).entity("Unknown instrument code").build();
         }
 
-        SessionFactory sessionFactory = new Configuration().configure()
-                .buildSessionFactory();
-        Session session = sessionFactory.openSession();
-
+        Session session = SessionManager.getSessionFactory().openSession();
         session.beginTransaction();
 
         Orders ord = new Orders(1, instID, price, quantity, notes);
