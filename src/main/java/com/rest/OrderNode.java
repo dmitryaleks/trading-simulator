@@ -14,8 +14,6 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 
 @Path("/order")
 public class OrderNode {

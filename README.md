@@ -24,6 +24,59 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * make a request at the app address:
   <http://localhost:8080/RESTServer/orders?stockCode=6753.T>
 
+## Enabling CORS (Cross-Origin Request Sharing) on Jersey side
+
+CORS needs to be enabled on the server side. Server should respond with proper headers.
+
+Key headers to allow CORS on preflight requests made by browsers are as follows:
+  * Access-Control-Allow-Origin: specifies what origins can make requests (* stands for any);
+  * Access-Control-Allow-Headers: should contain "Crossdomain";
+  * Access-Control-Allow-Methods: should contain "OPTIONS".
+
+Define a filter:
+```
+package com.rest.cors;
+
+import java.io.IOException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class CORSFilter implements ContainerResponseFilter {
+
+    @Override
+    public void filter(ContainerRequestContext request,
+                       ContainerResponseContext response) throws IOException {
+        response.getHeaders().add("Access-Control-Allow-Origin", "*");
+        response.getHeaders().add("Access-Control-Allow-Headers",
+                "Origin, Content-Type, Accept, Authorization, Crossdomain");
+        response.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        response.getHeaders().add("Access-Control-Allow-Methods",
+                "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+    }
+}
+```
+
+Apply filter:
+```
+package com.rest;
+
+import com.rest.cors.CORSFilter;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import javax.ws.rs.ApplicationPath;
+
+@ApplicationPath("/")
+public class Server extends ResourceConfig {
+
+    public Server() {
+        register(CORSFilter.class);
+    }
+}
+```
+
 ## Test server
 
 Place an order using a POST request:
