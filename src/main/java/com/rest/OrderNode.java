@@ -79,4 +79,36 @@ public class OrderNode {
         return Response.status(200).entity(ord.getJSON().toString()).build();
     }
 
+    @POST
+    @Path("/delete")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteOrder(String request) {
+
+        System.out.println("Got a POST request for ORDER deletion: " + request);
+
+        JSONObject req = null;
+        try {
+            req = new JSONObject(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String orderID = req.optString("orderID");
+
+        Orders ord = null;
+        try {
+            ord = OrderManager.getOrder(orderID);
+            ord.setStatus("C");
+            Session session = SessionManager.getSessionFactory().openSession();
+            session.beginTransaction();
+            session.update(ord);
+            session.getTransaction().commit();
+            session.close();
+        } catch (OrderManager.OrderLookupException e) {
+            e.printStackTrace();
+        }
+
+        return Response.status(200).entity(ord.getJSON().toString()).build();
+    }
+
 }

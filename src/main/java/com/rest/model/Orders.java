@@ -25,7 +25,10 @@ public class Orders implements Serializable {
     private String status;
 
     public Orders() {
+    }
 
+    public Orders(int orderID) {
+        this.order_id = orderID;
     }
 
     public Orders(int version, int inst_id, String side, double price, double quantity, String notes) {
