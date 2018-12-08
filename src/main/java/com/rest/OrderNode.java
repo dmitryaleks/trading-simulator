@@ -1,5 +1,6 @@
 package com.rest;
 
+import com.rest.matching.MatchingEngine;
 import com.rest.model.Orders;
 import com.rest.session.SessionManager;
 import com.rest.util.InstrumentManager;
@@ -66,13 +67,8 @@ public class OrderNode {
             return Response.status(400).entity("Unknown instrument code").build();
         }
 
-        Session session = SessionManager.getSessionFactory().openSession();
-        session.beginTransaction();
-
         Orders ord = new Orders(1, instID, side, price, quantity, notes);
-        session.save(ord);
-        session.getTransaction().commit();
-        session.close();
+        MatchingEngine.getInstance().addOrder(ord);
 
         return Response.status(200).entity(ord.getJSON().toString()).build();
     }

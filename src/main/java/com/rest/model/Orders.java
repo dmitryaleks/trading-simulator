@@ -3,7 +3,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import javax.persistence.*;
 
 @Entity
@@ -14,7 +15,10 @@ public class Orders implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int order_id;
 
-    private Date timestamp;
+    @Column(name="timestamp", nullable=false)
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date timestamp;
+
     private int version;
     private int inst_id;
     private double price;
@@ -119,8 +123,18 @@ public class Orders implements Serializable {
         return timestamp;
     }
 
+    public String getTimestampString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        return sdf.format(getTimestamp());
+    }
+
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        timestamp = new Date(new java.util.Date().getTime());
     }
 
     public JSONObject getJSON() {
@@ -134,11 +148,22 @@ public class Orders implements Serializable {
             res.put("Side",    getSide());
             res.put("QuantityFilled", getQuantity_filled());
             res.put("Status",  getStatus());
-            res.put("Timestamp", getTimestamp());
+            res.put("Timestamp", getTimestampString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return res;
     }
 
+    public String getMatchingKey() {
+        return String.format("%d-%s", getInst_id(), getSide().equals("B")?"S":"B");
+    }
+
+    public String getSelfKey() {
+        return String.format("%d-%s", getInst_id(), getSide());
+    }
+
+    public String toString() {
+        return String.format("#%d: [%d] %s %.2f@%.2f", getOrderID(), getInst_id(), getSide(), getQuantity(), getPrice());
+    }
 }

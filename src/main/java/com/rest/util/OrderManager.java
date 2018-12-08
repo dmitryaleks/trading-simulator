@@ -7,9 +7,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Order;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -66,5 +63,21 @@ public class OrderManager {
         }
 
         return orders;
+    }
+
+    public static void commitOrder(final Orders ord) {
+        Session session = SessionManager.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.save(ord);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    public static void updateOrder(final Orders ord) {
+        Session session = SessionManager.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.update(ord);
+        session.getTransaction().commit();
+        session.close();
     }
 }
