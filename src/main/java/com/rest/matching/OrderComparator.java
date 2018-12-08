@@ -12,9 +12,9 @@ public class OrderComparator implements Comparator<Orders> {
            return priceComparison;
        } else {
            if (left.getTimestamp().after(right.getTimestamp())) {
-               return -1;
-           } else {
                return 1;
+           } else {
+               return -1;
            }
        }
     }

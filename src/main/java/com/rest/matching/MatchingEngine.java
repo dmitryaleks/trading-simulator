@@ -1,8 +1,10 @@
 package com.rest.matching;
 
 import com.rest.model.Orders;
+import com.rest.session.SessionManager;
 import com.rest.util.OrderManager;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
+import org.hibernate.Session;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +72,8 @@ public class MatchingEngine {
     }
 
     public void cancelOrder(Orders ord) {
-        // TODO
+        ord.setStatus("C");
+        queues.get(ord.getSelfKey()).deleteOrder(ord);
+        OrderManager.updateOrder(ord);
     }
 }

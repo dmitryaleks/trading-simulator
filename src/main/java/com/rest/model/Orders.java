@@ -5,6 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.io.Serializable;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
@@ -165,5 +166,18 @@ public class Orders implements Serializable {
 
     public String toString() {
         return String.format("#%d: [%d] %s %.2f@%.2f", getOrderID(), getInst_id(), getSide(), getQuantity(), getPrice());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Orders orders = (Orders) o;
+        return order_id == orders.order_id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(order_id);
     }
 }

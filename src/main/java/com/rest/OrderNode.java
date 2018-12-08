@@ -92,12 +92,8 @@ public class OrderNode {
         Orders ord = null;
         try {
             ord = OrderManager.getOrder(orderID);
-            ord.setStatus("C");
-            Session session = SessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.update(ord);
-            session.getTransaction().commit();
-            session.close();
+            MatchingEngine.getInstance().cancelOrder(ord);
+
         } catch (OrderManager.OrderLookupException e) {
             e.printStackTrace();
         }
