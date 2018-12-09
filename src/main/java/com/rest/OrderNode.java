@@ -2,7 +2,6 @@ package com.rest;
 
 import com.rest.matching.MatchingEngine;
 import com.rest.model.Orders;
-import com.rest.session.SessionManager;
 import com.rest.util.InstrumentManager;
 import com.rest.util.OrderManager;
 import org.codehaus.jettison.json.JSONArray;
@@ -13,8 +12,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-
-import org.hibernate.Session;
 
 @Path("/order")
 public class OrderNode {
@@ -28,7 +25,7 @@ public class OrderNode {
     public Response get(@DefaultValue("6758.T") @QueryParam("instCode") String instCode) {
 
         try {
-            List<JSONObject> orders = OrderManager.getAllOrders();
+            List<JSONObject> orders = OrderManager.getAllOrdersJSON();
             JSONArray res = new JSONArray();
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();

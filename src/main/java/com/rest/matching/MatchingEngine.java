@@ -2,16 +2,14 @@ package com.rest.matching;
 
 import com.rest.model.Orders;
 import com.rest.model.Trade;
-import com.rest.session.SessionManager;
 import com.rest.util.OrderManager;
 import com.rest.util.TradeManager;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
-import org.hibernate.Session;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MatchingEngine {
 
@@ -29,7 +27,16 @@ public class MatchingEngine {
     }
 
     public MatchingEngine() {
-        // TODO load active orders from DB into "queues"
+        System.out.println("MatchingEngine constructed");
+        // load active orders from DB into "queues"
+        try {
+            List<Orders> existingOrders = OrderManager.getAllOrders();
+            List<Orders> activeOrders = existingOrders.stream().
+                    filter(ord -> ord.getStatus().equals("A")).collect(Collectors.toList());
+            activeOrders.forEach(ord -> enqueueOrder(ord));
+        } catch (OrderManager.OrderLookupException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addOrder(Orders ord) {
@@ -83,13 +90,7 @@ public class MatchingEngine {
 
         // place the remainder of the incoming order on a queue
         if(ord.getStatus() == "A") {
-            if(queues.containsKey(ord.getSelfKey())) {
-                queues.get(ord.getSelfKey()).addOrder(ord);
-            } else {
-                OrderQueue oq = new OrderQueue();
-                oq.addOrder(ord);
-                queues.put(ord.getSelfKey(), oq);
-            }
+            enqueueOrder(ord);
         }
 
         OrderManager.commitOrder(ord);
@@ -104,4 +105,15 @@ public class MatchingEngine {
         queues.get(ord.getSelfKey()).deleteOrder(ord);
         OrderManager.updateOrder(ord);
     }
+
+    private void enqueueOrder(final Orders ord) {
+        if(queues.containsKey(ord.getSelfKey())) {
+            queues.get(ord.getSelfKey()).addOrder(ord);
+        } else {
+            OrderQueue oq = new OrderQueue();
+            oq.addOrder(ord);
+            queues.put(ord.getSelfKey(), oq);
+        }
+    }
+
 }
