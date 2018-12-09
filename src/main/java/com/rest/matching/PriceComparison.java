@@ -23,6 +23,15 @@ public class PriceComparison {
         return false;
     }
 
+    static Double getMatchPrice(final Orders incoming, final Orders resting) {
+
+        if(!areInMatch(incoming, resting)) {
+            throw new RuntimeException("Orders are not in match");
+        }
+
+        return resting.getPrice();
+    }
+
     static int priceCompare(final Orders left, final Orders right) {
         if (left.getPrice() == right.getPrice()) {
             return 0;

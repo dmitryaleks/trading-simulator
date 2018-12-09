@@ -24,6 +24,7 @@
         <!-- Annotated entity classes -->
         <mapping class="com.rest.model.Orders"/>
         <mapping class="com.rest.model.Instrument"/>
+        <mapping class="com.rest.model.Trade"/>
 
     </session-factory>
 </hibernate-configuration>

@@ -249,7 +249,7 @@ Add a relation (note that foreign key is defined using the "REFERENCES" keyword)
 
 ```sql
 CREATE TABLE orders (
-        timestamp date,
+        timestamp(3) date,
         order_id serial PRIMARY KEY,
         version bigint,
         inst_id serial REFERENCES instrument(instrument_id),
@@ -284,6 +284,16 @@ Update existing data:
 
 ```
 UPDATE orders SET quantity_filled=0;
+```
+
+Grant permissions for table access to a given user:
+```
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app;
+```
+
+Grant permissions for serial key access to a given user:
+```
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app;
 ```
 
 ## Notes on Hibernate

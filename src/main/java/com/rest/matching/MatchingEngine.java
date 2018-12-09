@@ -1,12 +1,16 @@
 package com.rest.matching;
 
 import com.rest.model.Orders;
+import com.rest.model.Trade;
 import com.rest.session.SessionManager;
 import com.rest.util.OrderManager;
+import com.rest.util.TradeManager;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.hibernate.Session;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class MatchingEngine {
@@ -24,23 +28,38 @@ public class MatchingEngine {
         return me;
     }
 
+    public MatchingEngine() {
+        // TODO load active orders from DB into "queues"
+    }
+
     public void addOrder(Orders ord) {
 
-        // try to match with resting orders
-        // TODO repeat this process until there are no matching orders found
+        // try to match incoming order with resting orders
         final String matchingKey = ord.getMatchingKey();
-        if (queues.containsKey(matchingKey) && queues.get(matchingKey).size() > 0) {
+        boolean matchingCompleted = false;
+
+        List<Trade> incomingTrades = new LinkedList<>();
+
+        // repeat matching until there are no matching orders found or incoming order got filled
+        while (queues.containsKey(matchingKey) &&
+               queues.get(matchingKey).size() > 0 &&
+               !matchingCompleted) {
 
             Orders hpOrder = queues.get(matchingKey).getHighestPriorityOrder();
 
-            if(PriceComparison.areInMatch(hpOrder, ord)) {
+            if (PriceComparison.areInMatch(hpOrder, ord)) {
 
-                // TODO publish a trade
                 double tradeQty = Math.min(
                         hpOrder.getQuantity() - hpOrder.getQuantity_filled(),
                         ord.getQuantity() - ord.getQuantity_filled());
-                hpOrder.setQuantity_filled(hpOrder.getQuantity_filled() + tradeQty);
-                ord.setQuantity_filled(ord.getQuantity_filled() + tradeQty);
+
+                double tradePrice = PriceComparison.getMatchPrice(ord, hpOrder);
+
+                hpOrder.addTrade(tradeQty, tradePrice);
+                ord.addTrade(tradeQty, tradePrice);
+
+                // accumulate trades on incoming order
+                incomingTrades.add(new Trade(ord.getOrderID(), tradeQty, tradePrice));
 
                 System.out.println(String.format("Order %s has matched with resting order %s", ord, hpOrder));
 
@@ -49,15 +68,20 @@ public class MatchingEngine {
                     queues.get(matchingKey).deleteOrder(hpOrder);
                 }
 
+                // publish trade
+                TradeManager.commitTrade(new Trade(hpOrder.getOrderID(), tradeQty, tradePrice));
                 OrderManager.updateOrder(hpOrder);
+
+                if (ord.getQuantity_filled() == ord.getQuantity()) {
+                    matchingCompleted = true;
+                    ord.setStatus("C");
+                }
+            } else {
+                matchingCompleted = true;
             }
         }
 
-        if(ord.getQuantity() == ord.getQuantity_filled()) {
-            ord.setStatus("C");
-        }
-
-        // TODO place remainder of the incoming order on a queue
+        // place the remainder of the incoming order on a queue
         if(ord.getStatus() == "A") {
             if(queues.containsKey(ord.getSelfKey())) {
                 queues.get(ord.getSelfKey()).addOrder(ord);
@@ -69,6 +93,10 @@ public class MatchingEngine {
         }
 
         OrderManager.commitOrder(ord);
+        for(Trade t: incomingTrades) {
+            t.setOrder_id(ord.getOrderID());
+        }
+        TradeManager.commitTrades(incomingTrades);
     }
 
     public void cancelOrder(Orders ord) {

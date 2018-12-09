@@ -27,6 +27,7 @@ public class Orders implements Serializable {
     private String notes;
     private String side;
     private double quantity_filled;
+    private double fill_price;
     private String status;
 
     public Orders() {
@@ -45,6 +46,7 @@ public class Orders implements Serializable {
         this.side = side;
         this.status = "A";
         this.quantity_filled = 0;
+        this.fill_price = 0;
         this.timestamp = new Date(new java.util.Date().getTime());
     }
 
@@ -112,6 +114,14 @@ public class Orders implements Serializable {
         this.quantity_filled = quantity_filled;
     }
 
+    public double getFill_price() {
+        return fill_price;
+    }
+
+    public void setFill_price(double fill_price) {
+        this.fill_price = fill_price;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -148,6 +158,7 @@ public class Orders implements Serializable {
             res.put("Notes",   getNotes());
             res.put("Side",    getSide());
             res.put("QuantityFilled", getQuantity_filled());
+            res.put("FillPrice", getFill_price());
             res.put("Status",  getStatus());
             res.put("Timestamp", getTimestampString());
         } catch (JSONException e) {
@@ -179,5 +190,16 @@ public class Orders implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(order_id);
+    }
+
+    public Orders addTrade(double quantity, double price) {
+        double currentFilledQty = getQuantity_filled();
+        double currentFillPrice = getFill_price();
+
+        double newFillPrice = ((currentFillPrice * currentFilledQty) + (price * quantity))/(currentFilledQty + quantity);
+
+        setQuantity_filled(currentFilledQty + quantity);
+        setFill_price(newFillPrice);
+        return this;
     }
 }
