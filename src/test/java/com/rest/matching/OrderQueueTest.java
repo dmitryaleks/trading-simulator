@@ -29,6 +29,7 @@ public class OrderQueueTest {
         int i = 0;
         while(oq.size() > 0) {
             Orders hpOrder = oq.getHighestPriorityOrder();
+            oq.deleteOrder(hpOrder);
             System.out.println(hpOrder.getNotes());
             assertEquals(hpOrder, expectedOrder.get(i++));
         }

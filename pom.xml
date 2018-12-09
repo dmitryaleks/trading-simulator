@@ -4,9 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.server</groupId>
+    <groupId>com.rest</groupId>
     <artifactId>RESTServer</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <dependencyManagement>
         <dependencies>
@@ -21,17 +22,32 @@
     </dependencyManagement>
 
     <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <jersey.version>2.23.2</jersey.version>
         <hibernate.version>4.2.15.Final</hibernate.version>
     </properties>
 
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+				    <webXml>web/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+		</plugins>
+    </build>
+
     <dependencies>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-        </dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
