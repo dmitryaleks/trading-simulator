@@ -24,6 +24,18 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * make a request at the app address:
   <http://localhost:8080/RESTServer/orders?stockCode=6753.T>
 
+## To test via Internet
+
+Start a tonnel as follows:
+```
+ssh -R dmi3aleks:80:localhost:5000 serveo.net
+```
+
+Access the site via:
+```
+https://dmi3aleks.serveo.net
+```
+
 ## Enabling CORS (Cross-Origin Request Sharing) on Jersey side
 
 CORS needs to be enabled on the server side. Server should respond with proper headers.
