@@ -36,7 +36,7 @@ public class PriceComparison {
         if (left.getPrice() == right.getPrice()) {
             return 0;
         } else {
-            if (left.getSide() == "S") {
+            if (left.getSide().equals("S")) {
                 if (left.getPrice() > right.getPrice()) {
                     return 1;
                 } else {
