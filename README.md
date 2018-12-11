@@ -1,7 +1,27 @@
-# RESTServer
+# Trading Simulator Server
+
+Enables placing orders and getting trades generated based on order's price-time priority.
+
+## Overall architecture
 
 Jersey based REST Server with Hibernate+PostgreSQL persistence.
 
+  * Database Engine:  PostgreSQL (9.5.7)
+  * ORM:              Hibernate (4.2.15)
+  * REST Server:      Jersey (2.23.2)
+  * Back-end tests:   JUnit (4.12)
+  * Build management: Maven (3.3.3)
+  * Front-end:        React.js (15) + Axios (to fetch data from the REST server)
+  * Front-end tests:  Selenium (Java) (3.4.0)
+
+Relevant projects:
+  * front-end: "Trading Dashboard":
+
+  <https://github.com/dmi3aleks/React/tree/master/dashboard>
+
+  * front-end tests:
+
+  <https://github.com/dmi3aleks/WebAppTester>
 
 ## Deployment of a Jersey based web app to a Tomcat web server
 
@@ -570,7 +590,7 @@ public static List<JSONObject> getAllOrders() throws OrderLookupException {
 }
 ```
 
-Insert records using HQL:
+Insert records using a Hibernate session:
 
 ```java
 SessionFactory sessionFactory = new Configuration().configure()
@@ -583,4 +603,22 @@ Orders ord = new Orders(1, instID, price, quantity, notes);
 session.save(ord);
 session.getTransaction().commit();
 session.close();
+```
+
+Select records using HQL:
+
+```java
+public static List<JSONObject> getAllTrades() throws TradeLookupException {
+
+	Session session = SessionManager.getSessionFactory().openSession();
+	final String getInstrHQL = String.format("SELECT T FROM Trade T ORDER BY T.trade_id");
+	Query query = session.createQuery(getInstrHQL);
+	List<Trade> trades = query.list();
+	session.close();
+	if(trades.size() == 0) {
+		throw new TradeLookupException(String.format("No trades found"));
+	}
+
+	return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());
+}
 ```
