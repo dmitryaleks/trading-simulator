@@ -1,5 +1,6 @@
 package com.rest.util;
 
+import com.rest.model.Orders;
 import com.rest.model.Trade;
 import com.rest.session.SessionManager;
 import org.codehaus.jettison.json.JSONObject;
@@ -28,6 +29,32 @@ public class TradeManager {
         session.close();
         if(trades.size() == 0) {
             throw new TradeLookupException(String.format("No trades found"));
+        }
+
+        return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());
+    }
+
+    public static List<JSONObject> getTrades(final String instrCode) throws TradeLookupException {
+
+        List<Trade> trades = new LinkedList<>();
+        try {
+            final int instrID = InstrumentManager.getInstrument(instrCode).getInstrument_id();
+            Session session = SessionManager.getSessionFactory().openSession();
+            final String getInstrHQL = String.format("SELECT T, O FROM Trade T, Orders O WHERE O.order_id = T.order_id ORDER BY T.trade_id");
+            Query query = session.createQuery(getInstrHQL);
+            List<Object[]> res = query.list();
+            session.close();
+
+            trades = res.stream()
+                    .filter(elm -> ((Orders)elm[1]).getInst_id() == instrID)
+                    .map(elm -> (Trade)elm[0]).collect(Collectors.toList());
+
+            if(trades.size() == 0) {
+                throw new TradeLookupException(String.format("No trades found"));
+            }
+        } catch (InstrumentManager.InstrumentLookupException e) {
+            e.printStackTrace();
+            throw new TradeLookupException(String.format("Unknown instrument"));
         }
 
         return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());

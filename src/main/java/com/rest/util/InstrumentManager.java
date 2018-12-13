@@ -20,9 +20,7 @@ public class InstrumentManager {
 
     public static Instrument getInstrument(final String instrCode) throws InstrumentLookupException {
 
-        SessionFactory sessionFactory = new Configuration().configure()
-                .buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = SessionManager.getSessionFactory().openSession();
         final String getInstrHQL = String.format("SELECT I FROM Instrument I WHERE I.name = '%s'", instrCode);
         Query query = session.createQuery(getInstrHQL);
         List<Instrument> instruments = query.list();

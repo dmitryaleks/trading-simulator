@@ -2,6 +2,7 @@ package com.rest;
 
 import com.rest.matching.MatchingEngine;
 import com.rest.model.Orders;
+import com.rest.model.Trade;
 import com.rest.util.InstrumentManager;
 import com.rest.util.OrderManager;
 import com.rest.util.TradeManager;
@@ -30,6 +31,23 @@ public class TradeNode {
             ex.printStackTrace();
         }
         return Response.status(210).entity("No orders found").build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/byInstr")
+    public Response getTrades(@DefaultValue("6758.T") @QueryParam("instCode") String instCode) {
+        // http://localhost:8080/trade/byInstr?instCode=6758.T
+
+        try {
+            List<JSONObject> orders = TradeManager.getTrades(instCode);
+            JSONArray res = new JSONArray();
+            orders.stream().forEach(ord -> res.put(ord));
+            return Response.status(200).entity(res.toString()).build();
+        } catch (final TradeManager.TradeLookupException ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(210).build();
     }
 
 }
