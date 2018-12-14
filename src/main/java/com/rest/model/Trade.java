@@ -21,15 +21,17 @@ public class Trade implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     public Date timestamp;
 
-    private int order_id;
+    private int resting_order_id;
+    private int incoming_order_id;
     private double price;
     private double quantity;
 
     public Trade() {
     }
 
-    public Trade(int order_id, double quantity, double price) {
-        this.order_id = order_id;
+    public Trade(int resting_order_id, int incoming_order_id, double quantity, double price) {
+        this.resting_order_id = resting_order_id;
+        this.incoming_order_id = incoming_order_id;
         this.quantity = quantity;
         this.price = price;
         this.timestamp = new Date(new Date().getTime());
@@ -41,14 +43,6 @@ public class Trade implements Serializable {
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public int getOrderID() {
-        return order_id;
-    }
-
-    public void setOrderID(int orderID) {
-        this.order_id = orderID;
     }
 
     public double getQuantity() {
@@ -80,12 +74,20 @@ public class Trade implements Serializable {
         this.trade_id = trade_id;
     }
 
-    public int getOrder_id() {
-        return order_id;
+    public int getResting_order_id() {
+        return resting_order_id;
     }
 
-    public void setOrder_id(int order_id) {
-        this.order_id = order_id;
+    public void setResting_order_id(int resting_order_id) {
+        this.resting_order_id = resting_order_id;
+    }
+
+    public int getIncoming_order_id() {
+        return incoming_order_id;
+    }
+
+    public void setIncoming_order_id(int incoming_order_id) {
+        this.incoming_order_id = incoming_order_id;
     }
 
     @PrePersist
@@ -97,7 +99,8 @@ public class Trade implements Serializable {
         JSONObject res = new JSONObject();
         try {
             res.put("TradeID", getTrade_id());
-            res.put("OrderID", getOrderID());
+            res.put("RestingOrderID", getResting_order_id());
+            res.put("IncomingOrderID", getIncoming_order_id());
             res.put("Quantity",getQuantity());
             res.put("Price",   getPrice());
             res.put("Timestamp", getTimestampString());
@@ -108,7 +111,7 @@ public class Trade implements Serializable {
     }
 
     public String toString() {
-        return String.format("Trade #%d: [%d] %.2f@%.2f", getTrade_id(), getOrderID(), getQuantity(), getPrice());
+        return String.format("Trade #%d: [%d<->%d] %.2f@%.2f", getTrade_id(), getResting_order_id(), getIncoming_order_id(), getQuantity(), getPrice());
     }
 
     @Override

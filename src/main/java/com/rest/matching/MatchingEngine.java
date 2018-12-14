@@ -65,8 +65,8 @@ public class MatchingEngine {
                 hpOrder.addTrade(tradeQty, tradePrice);
                 ord.addTrade(tradeQty, tradePrice);
 
-                // accumulate trades on incoming order
-                incomingTrades.add(new Trade(ord.getOrderID(), tradeQty, tradePrice));
+                // accumulate trades triggered by the incoming order
+                incomingTrades.add(new Trade(hpOrder.getOrderID(), ord.getOrderID(), tradeQty, tradePrice));
 
                 System.out.println(String.format("Order %s has matched with resting order %s", ord, hpOrder));
 
@@ -75,8 +75,6 @@ public class MatchingEngine {
                     queues.get(matchingKey).deleteOrder(hpOrder);
                 }
 
-                // publish trade
-                TradeManager.commitTrade(new Trade(hpOrder.getOrderID(), tradeQty, tradePrice));
                 OrderManager.updateOrder(hpOrder);
 
                 if (ord.getQuantity_filled() == ord.getQuantity()) {
@@ -94,8 +92,9 @@ public class MatchingEngine {
         }
 
         OrderManager.commitOrder(ord);
+        // publish trades
         for(Trade t: incomingTrades) {
-            t.setOrder_id(ord.getOrderID());
+            t.setIncoming_order_id(ord.getOrderID());
         }
         TradeManager.commitTrades(incomingTrades);
     }

@@ -328,6 +328,11 @@ Grant permissions for serial key access to a given user:
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app;
 ```
 
+Reset sequence for a serial key:
+```
+ALTER SEQUENCE trade_trade_id_seq RESTART WITH 1;
+```
+
 ## Notes on Hibernate
 
 ### Setup with Maven
