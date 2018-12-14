@@ -21,15 +21,15 @@ public class Trade implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     public Date timestamp;
 
-    private int resting_order_id;
-    private int incoming_order_id;
+    private Long resting_order_id;
+    private Long incoming_order_id;
     private double price;
     private double quantity;
 
     public Trade() {
     }
 
-    public Trade(int resting_order_id, int incoming_order_id, double quantity, double price) {
+    public Trade(Long resting_order_id, Long incoming_order_id, double quantity, double price) {
         this.resting_order_id = resting_order_id;
         this.incoming_order_id = incoming_order_id;
         this.quantity = quantity;
@@ -74,19 +74,19 @@ public class Trade implements Serializable {
         this.trade_id = trade_id;
     }
 
-    public int getResting_order_id() {
+    public Long getResting_order_id() {
         return resting_order_id;
     }
 
-    public void setResting_order_id(int resting_order_id) {
+    public void setResting_order_id(Long resting_order_id) {
         this.resting_order_id = resting_order_id;
     }
 
-    public int getIncoming_order_id() {
+    public Long getIncoming_order_id() {
         return incoming_order_id;
     }
 
-    public void setIncoming_order_id(int incoming_order_id) {
+    public void setIncoming_order_id(Long incoming_order_id) {
         this.incoming_order_id = incoming_order_id;
     }
 

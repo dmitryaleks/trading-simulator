@@ -333,6 +333,11 @@ Reset sequence for a serial key:
 ALTER SEQUENCE trade_trade_id_seq RESTART WITH 1;
 ```
 
+Check the latest value in the sequence used for a serial key:
+```
+SELECT last_value FROM orders_order_id_seq;
+```
+
 ## Notes on Hibernate
 
 ### Setup with Maven
@@ -627,3 +632,42 @@ public static List<JSONObject> getAllTrades() throws TradeLookupException {
 	return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());
 }
 ```
+
+Select records using Session.get():
+
+```java
+public static Orders getOrder(final String orderID) throws OrderLookupException {
+
+	Session session = SessionManager.getSessionFactory().openSession();
+	Orders order = (Orders)session.get(Orders.class, Long.valueOf(orderID));
+	session.close();
+
+	if(order == null) {
+		throw new OrderLookupException(String.format("Order %s not found", orderID));
+	}
+
+	return order;
+}
+```
+
+### Entity state machine
+
+Any entity instance in your application appears in one of the three main states in relation to the Session persistence context:
+  * transient — this instance is not, and never was, attached to a Session; this instance has no corresponding rows in the database; it’s usually just a new object that you have created to save to the database;
+  * persistent — this instance is associated with a unique Session object; upon flushing the Session to the database, this entity is guaranteed to have a corresponding consistent record in the database;
+  * detached — this instance was once attached to a Session (in a persistent state), but now it’s not; an instance enters this state if you evict it from the context, clear or close the Session, or put the instance through serialization/deserialization process.
+
+### Action types
+
+#### When persisting entities
+
+  * persist - transitions entity into a persistent state without generating an ID;
+  * save    - transitions entity into a persistent state and generates an ID immediately (issues an ID generation command to DBMS);
+  * merge   - updates a persistent entity instance with new field values from a detached entity instance;
+  * update  - transitions the passed object from detached to persistent state;
+
+#### When retrieving entities
+
+  * get     - selects record from DBMS and creates an object fo rit;
+  * load    - creates a proxy object that can be used to establish a relationship with other records without selecting data from DBMS (E.g. when commiting a relation b/w records).
+  * evict   - transitions the passed object from persistent to detached state.

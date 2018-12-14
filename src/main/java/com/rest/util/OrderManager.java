@@ -2,6 +2,7 @@ package com.rest.util;
 
 import com.rest.model.Instrument;
 import com.rest.model.Orders;
+import com.rest.model.Trade;
 import com.rest.session.SessionManager;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -25,20 +26,14 @@ public class OrderManager {
     public static Orders getOrder(final String orderID) throws OrderLookupException {
 
         Session session = SessionManager.getSessionFactory().openSession();
-        final String getInstrHQL = String.format("SELECT O FROM Orders O WHERE O.order_id = '%s'", orderID);
-        Query query = session.createQuery(getInstrHQL);
-        List<Orders> orders = query.list();
+        Orders order = (Orders)session.get(Orders.class, Long.valueOf(orderID));
         session.close();
 
-        if(orders.size() == 0) {
+        if(order == null) {
             throw new OrderLookupException(String.format("Order %s not found", orderID));
         }
 
-        if(orders.size() > 1) {
-            throw new OrderLookupException(String.format("Ambiguous order ID: %s", orderID));
-        }
-
-        return orders.get(0);
+        return order;
     }
 
     public static List<Orders> getAllOrders() throws OrderLookupException {
@@ -85,6 +80,28 @@ public class OrderManager {
         Session session = SessionManager.getSessionFactory().openSession();
         session.beginTransaction();
         session.save(ord);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    public static void commitOrdersWithTrade(final Orders resting_order, final Orders incoming_order, final Trade trade) {
+        Session session = SessionManager.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        trade.setResting_order_id(resting_order.getOrderID());
+        session.update(resting_order);
+
+        Long id = incoming_order.getOrderID();
+        // incoming order may or may not have been persisted already
+        if (id == null) {
+            id = (Long) session.save(incoming_order);
+        } else {
+            session.update(incoming_order);
+        }
+
+        trade.setIncoming_order_id(id);
+        session.save(trade);
+
         session.getTransaction().commit();
         session.close();
     }

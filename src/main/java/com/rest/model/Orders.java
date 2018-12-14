@@ -14,7 +14,7 @@ public class Orders implements Serializable {
     @Id
     @Column(name = "order_id", columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int order_id;
+    private Long order_id;
 
     @Column(name="timestamp", nullable=false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -33,7 +33,7 @@ public class Orders implements Serializable {
     public Orders() {
     }
 
-    public Orders(int orderID) {
+    public Orders(Long orderID) {
         this.order_id = orderID;
     }
 
@@ -58,11 +58,11 @@ public class Orders implements Serializable {
         this.price = price;
     }
 
-    public int getOrderID() {
+    public Long getOrderID() {
         return order_id;
     }
 
-    public void setOrderID(int orderID) {
+    public void setOrderID(Long orderID) {
         this.order_id = orderID;
     }
 

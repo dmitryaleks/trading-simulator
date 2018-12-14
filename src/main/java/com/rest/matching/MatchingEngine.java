@@ -44,8 +44,7 @@ public class MatchingEngine {
         // try to match incoming order with resting orders
         final String matchingKey = ord.getMatchingKey();
         boolean matchingCompleted = false;
-
-        List<Trade> incomingTrades = new LinkedList<>();
+        boolean matchFound = false;
 
         // repeat matching until there are no matching orders found or incoming order got filled
         while (queues.containsKey(matchingKey) &&
@@ -66,7 +65,7 @@ public class MatchingEngine {
                 ord.addTrade(tradeQty, tradePrice);
 
                 // accumulate trades triggered by the incoming order
-                incomingTrades.add(new Trade(hpOrder.getOrderID(), ord.getOrderID(), tradeQty, tradePrice));
+                Trade trade = new Trade(hpOrder.getOrderID(), ord.getOrderID(), tradeQty, tradePrice);
 
                 System.out.println(String.format("Order %s has matched with resting order %s", ord, hpOrder));
 
@@ -75,28 +74,27 @@ public class MatchingEngine {
                     queues.get(matchingKey).deleteOrder(hpOrder);
                 }
 
-                OrderManager.updateOrder(hpOrder);
-
                 if (ord.getQuantity_filled() == ord.getQuantity()) {
                     matchingCompleted = true;
                     ord.setStatus("C");
                 }
+
+                matchFound = true;
+                OrderManager.commitOrdersWithTrade(hpOrder, ord, trade);
             } else {
                 matchingCompleted = true;
             }
+        }
+
+        if (!matchFound) {
+            // simply commit incoming order to become a resting order
+            OrderManager.commitOrder(ord);
         }
 
         // place the remainder of the incoming order on a queue
         if(ord.getStatus() == "A") {
             enqueueOrder(ord);
         }
-
-        OrderManager.commitOrder(ord);
-        // publish trades
-        for(Trade t: incomingTrades) {
-            t.setIncoming_order_id(ord.getOrderID());
-        }
-        TradeManager.commitTrades(incomingTrades);
     }
 
     public void cancelOrder(Orders ord) {
