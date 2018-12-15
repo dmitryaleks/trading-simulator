@@ -10,6 +10,7 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * ORM:              Hibernate (4.2.15)
   * REST Server:      Jersey (2.23.2)
   * Back-end tests:   JUnit (4.12)
+  * REST API tests:   REST Assured (Java) (3.2.0)
   * Build management: Maven (3.3.3)
   * Front-end:        React.js (15) + Axios (to fetch data from the REST server)
   * Front-end tests:  Selenium (Java) (3.4.0)

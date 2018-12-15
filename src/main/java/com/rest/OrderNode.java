@@ -49,12 +49,12 @@ public class OrderNode {
             e.printStackTrace();
         }
 
-        Double price = Double.valueOf(req.optString("price"));
-        Double quantity = Double.valueOf(req.optString("quantity"));
+        Double price = Double.valueOf(req.optString("Price"));
+        Double quantity = Double.valueOf(req.optString("Quantity"));
 
-        String instCode = req.optString("instCode");
-        String notes = req.optString("notes");
-        String side = req.optString("side");
+        String instCode = req.optString("InstrCode");
+        String notes = req.optString("Notes");
+        String side = req.optString("Side");
 
         int instID = 0;
         try {
