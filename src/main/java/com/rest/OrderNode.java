@@ -2,6 +2,7 @@ package com.rest;
 
 import com.rest.matching.MatchingEngine;
 import com.rest.model.Orders;
+import com.rest.model.common.Side;
 import com.rest.util.InstrumentManager;
 import com.rest.util.OrderManager;
 import org.codehaus.jettison.json.JSONArray;
@@ -54,7 +55,7 @@ public class OrderNode {
 
         String instCode = req.optString("InstrCode");
         String notes = req.optString("Notes");
-        String side = req.optString("Side");
+        Side side = Side.valueOf(req.optString("Side"));
 
         int instID = 0;
         try {
@@ -84,7 +85,7 @@ public class OrderNode {
             e.printStackTrace();
         }
 
-        String orderID = req.optString("orderID");
+        String orderID = req.optString("OrderID");
 
         Orders ord = null;
         try {

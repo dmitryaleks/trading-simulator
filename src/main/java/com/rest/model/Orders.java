@@ -1,4 +1,5 @@
 package com.rest.model;
+import com.rest.model.common.Side;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -25,7 +26,10 @@ public class Orders implements Serializable {
     private double price;
     private double quantity;
     private String notes;
-    private String side;
+
+    @Enumerated(EnumType.STRING)
+    private Side side;
+
     private double quantity_filled;
     private double fill_price;
     private String status;
@@ -37,7 +41,7 @@ public class Orders implements Serializable {
         this.order_id = orderID;
     }
 
-    public Orders(int version, int inst_id, String side, double price, double quantity, String notes) {
+    public Orders(int version, int inst_id, Side side, double price, double quantity, String notes) {
         this.version = version;
         this.inst_id = inst_id;
         this.price = price;
@@ -98,11 +102,11 @@ public class Orders implements Serializable {
         this.notes = notes;
     }
 
-    public String getSide() {
+    public Side getSide() {
         return side;
     }
 
-    public void setSide(String side) {
+    public void setSide(Side side) {
         this.side = side;
     }
 
@@ -156,7 +160,7 @@ public class Orders implements Serializable {
             res.put("Price",   getPrice());
             res.put("InstrID", getInst_id());
             res.put("Notes",   getNotes());
-            res.put("Side",    getSide());
+            res.put("Side",    getSide().getCode());
             res.put("QuantityFilled", getQuantity_filled());
             res.put("FillPrice", getFill_price());
             res.put("Status",  getStatus());
@@ -168,15 +172,15 @@ public class Orders implements Serializable {
     }
 
     public String getMatchingKey() {
-        return String.format("%d-%s", getInst_id(), getSide().equals("B")?"S":"B");
+        return String.format("%d-%s", getInst_id(), getSide() == Side.B?"S":"B");
     }
 
     public String getSelfKey() {
-        return String.format("%d-%s", getInst_id(), getSide());
+        return String.format("%d-%s", getInst_id(), getSide().name());
     }
 
     public String toString() {
-        return String.format("#%d: [%d] %s %.2f@%.2f", getOrderID(), getInst_id(), getSide(), getQuantity(), getPrice());
+        return String.format("#%d: [%d] %s %.2f@%.2f", getOrderID(), getInst_id(), getSide().name(), getQuantity(), getPrice());
     }
 
     @Override
@@ -184,7 +188,7 @@ public class Orders implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Orders orders = (Orders) o;
-        return order_id == orders.order_id;
+        return order_id.equals(orders.order_id);
     }
 
     @Override

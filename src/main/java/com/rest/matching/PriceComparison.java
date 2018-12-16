@@ -1,6 +1,7 @@
 package com.rest.matching;
 
 import com.rest.model.Orders;
+import com.rest.model.common.Side;
 
 public class PriceComparison {
 
@@ -10,7 +11,7 @@ public class PriceComparison {
             return false;
         }
 
-        if (left.getSide().equals("S")) {
+        if (left.getSide() == Side.S) {
             if(left.getPrice() <= right.getPrice()) {
                 return true;
             }
@@ -36,7 +37,7 @@ public class PriceComparison {
         if (left.getPrice() == right.getPrice()) {
             return 0;
         } else {
-            if (left.getSide().equals("S")) {
+            if (left.getSide() == Side.S) {
                 if (left.getPrice() > right.getPrice()) {
                     return 1;
                 } else {
