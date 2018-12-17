@@ -18,7 +18,7 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * Build management:   Maven (3.3.3)
   * Front-end:          React.js (15) + Axios (to fetch data from the REST server)
   * Push notifications: WebSocket (Java-WebSocket v1.3.0)
-  * Charts:             Rechart (v1.4.1) (charts for React.js)
+  * Charts:             Recharts (v1.4.1) (charts for React.js)
   * Front-end tests:    Selenium (Java) (3.4.0)
 
 Relevant projects:
@@ -718,3 +718,315 @@ Any entity instance in your application appears in one of the three main states 
   * get     - selects record from DBMS and creates an object fo rit;
   * load    - creates a proxy object that can be used to establish a relationship with other records without selecting data from DBMS (E.g. when commiting a relation b/w records).
   * evict   - transitions the passed object from persistent to detached state.
+
+## Notes on WebSockets
+
+WebSocket is a communications protocol, providing full-duplex communication channels over a single TCP connection.
+
+### Maven dependencies
+
+```
+<dependency>
+	<groupId>org.java-websocket</groupId>
+	<artifactId>Java-WebSocket</artifactId>
+	<version>1.3.0</version>
+</dependency>
+```
+
+### A simple server that allows pushing notifications to all connected and subscribed clients via WebSocket
+
+Key points:
+  * subclass WebSocketServer;
+  * implement abstract parent methods: onOpen(), onMessage(), onClose(), onError();
+  * pass port to listen on to the parent constructor;
+  * start the server by calling start() method.
+
+```java
+package com.rest.socket;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rest.socket.message.Message;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class Server extends WebSocketServer {
+
+    private static Server instance;
+
+    public static Server getInstance() {
+        if(instance == null) {
+            instance = new Server(7888);
+        }
+        return instance;
+    }
+
+    private Set<WebSocket> connections;
+    // maps subjects to subscribers
+    private Map<String, Set<WebSocket>> subscribers;
+    private Map<String, String> subjectData;
+
+    public Server(int port) {
+        super(new InetSocketAddress(port));
+        connections = new HashSet<>();
+        subscribers = new HashMap<>();
+        subjectData = new HashMap<>();
+    }
+
+    @Override
+    public void start() {
+        log(String.format("Starting a server at port: %d", super.getPort()));
+        super.start();
+    }
+
+    public void updateSubject(final String subject, final String data) {
+        subjectData.put(subject, data);
+        pushUpdate(subject);
+    }
+
+    @Override
+    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
+        connections.add(webSocket);
+        log(String.format("New connection from %s:%d",
+                webSocket.getRemoteSocketAddress().getHostName(),
+                webSocket.getRemoteSocketAddress().getPort()));
+
+    }
+
+    @Override
+    public void onClose(WebSocket webSocket, int i, String s, boolean b) {
+        connections.remove(webSocket);
+
+    }
+
+    @Override
+    public void onMessage(WebSocket webSocket, String msg) {
+        log("New message: " + msg);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Message message = mapper.readValue(msg, Message.class);
+
+            switch(message.getType()) {
+                case SUBSCRIBE:
+                    log("A new user has subscribed");
+                    subscribe(message.getSubject(), webSocket);
+                break;
+                case UNSUBSCRIBE:
+                    log("A user has unsubscribed");
+                    unsubscribe(message.getSubject(), webSocket);
+                break;
+            }
+        } catch (IOException e) {
+        }
+
+    }
+
+    @Override
+    public void onError(WebSocket webSocket, Exception e) {
+        log("[ERROR] " + e.getMessage());
+    }
+
+
+    private void pushUpdate(final String subject) {
+        if(!subscribers.containsKey(subject)) {
+            return;
+        }
+
+        List<WebSocket> subscribersToBeDiscontinued = new LinkedList<>();
+
+        subscribers.get(subject).forEach(subscriber -> {
+            try {
+                subscriber.send(subjectData.get(subject));
+            } catch (Throwable e) {
+                log("Could not send an update to the client");
+                // unsubscribe implicitly
+                subscribersToBeDiscontinued.add(subscriber);
+            }
+        });
+        subscribersToBeDiscontinued.forEach(s -> unsubscribe(subject, s));
+    }
+
+    private void unsubscribe(final String subject, final WebSocket subscriber) {
+        if(!subscribers.containsKey(subject) ||
+           !subscribers.get(subject).contains(subscriber)) {
+            return;
+        }
+        subscribers.get(subject).remove(subscriber);
+    }
+
+    private void subscribe(final String subject, final WebSocket subscriber) {
+        if(subscribers.containsKey(subject)) {
+            subscribers.get(subject).add(subscriber);
+        } else {
+            subscribers.put(subject, new HashSet<>(Arrays.asList(subscriber)));
+        }
+    }
+
+    static void log(final String msg) {
+        final String title = "[SERVER] ";
+        System.out.println(title + msg);
+    }
+
+    static String getCurrentTimestamp() {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        return sdf.format(new Date());
+    }
+}
+```
+
+### Simple JavaScript client that subscribes to a subject and updates React.js state whenever server pushes an update
+
+#### Socket wrapper
+
+```javascript
+const Config = {
+  PROTOCOL: "ws:",
+  HOST: "//localhost",
+  PORT: ":7888"
+}
+
+const Socket = (function() {
+
+  let instance;
+
+  function createInstance() {
+    const address = Config.PROTOCOL + Config.HOST + Config.PORT
+    const socket = new WebSocket(address)
+    console.log("Created a Socket instance at: " + address)
+    return socket;
+  }
+
+  return {
+    getInstance: function() {
+      if(!instance) {
+        instance = createInstance()
+      }
+      return instance
+    }
+  }
+
+
+})();
+
+export default Socket;
+```
+
+#### Subscription and push notification processing
+
+```javascript
+import Socket from './socket/Socket'
+
+class App extends React.Component {
+
+  constructor() {
+    super()
+
+    this.subscribeForPushNotifications()
+  }
+
+  subscribeForPushNotifications() {
+
+    const socket = Socket.getInstance()
+    socket.onopen = () => {
+      const msg = JSON.stringify({type:"SUBSCRIBE", subject:"ORDERS"})
+      socket.send(msg)
+    }
+    socket.onmessage = (msg) => {
+      console.log("SOCKET: " + msg.data)
+      this.refreshData()
+    }
+  }
+
+  //...skipping other logic...
+
+}
+```
+
+
+## Notes on Jackson (JSON Parser for Java)
+
+Jackson is a high-performance JSON parser for Java.
+
+### Maven dependencies
+
+```
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-databind</artifactId>
+	<version>2.9.2</version>
+</dependency>
+```
+
+### A sample POJO class used for data binding:
+
+```java
+package com.rest.socket.message;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Message implements Serializable {
+
+    private MessageType type;
+    private String subject;
+    private String data;
+
+    public MessageType getType() {
+        return type;
+    }
+
+    public void setType(MessageType type) {
+        this.type = type;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+}
+```
+
+### Sample of JSON message parsing
+
+```java
+@Override
+public void onMessage(WebSocket webSocket, String msg) {
+	log("New message: " + msg);
+
+	ObjectMapper mapper = new ObjectMapper();
+
+	try {
+		Message message = mapper.readValue(msg, Message.class);
+
+		switch(message.getType()) {
+			case SUBSCRIBE:
+				log("A new user has subscribed");
+				subscribe(message.getSubject(), webSocket);
+			break;
+			case UNSUBSCRIBE:
+				log("A user has unsubscribed");
+				unsubscribe(message.getSubject(), webSocket);
+			break;
+		}
+	} catch (IOException e) {
+	}
+}
+```
