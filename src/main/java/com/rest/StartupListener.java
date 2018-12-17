@@ -10,6 +10,7 @@ public class StartupListener implements ServletContextListener
 
     public void contextInitialized(ServletContextEvent arg0)
     {
+        new com.rest.socket.Server(7888).start();
         MatchingEngine.getInstance();
     }
 

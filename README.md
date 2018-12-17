@@ -1,26 +1,32 @@
-# Trading Simulator Server
+# Trading Simulator
 
 Enables placing orders and getting trades generated based on order's price-time priority.
+
+Comes with programmatic REST API and a simple web front-end.
 
 ## Overall architecture
 
 Jersey based REST Server with Hibernate+PostgreSQL persistence.
 
-  * Database Engine:  PostgreSQL (9.5.7)
-  * ORM:              Hibernate (4.2.15)
-  * REST Server:      Jersey (2.23.2)
-  * Back-end tests:   JUnit (4.12)
-  * REST API tests:   REST Assured (Java) (3.2.0)
-  * Build management: Maven (3.3.3)
-  * Front-end:        React.js (15) + Axios (to fetch data from the REST server)
-  * Front-end tests:  Selenium (Java) (3.4.0)
+  * Database Engine:    PostgreSQL (9.5.7)
+  * ORM:                Hibernate (4.2.15)
+  * REST Server:        Jersey (2.23.2)
+  * JSON processor:     Jackson (Java) (2.9.2)
+  * Web Server:         Tomcat (v8.0.44)
+  * Back-end tests:     JUnit (4.12)
+  * REST API tests:     REST Assured (Java) (3.2.0)
+  * Build management:   Maven (3.3.3)
+  * Front-end:          React.js (15) + Axios (to fetch data from the REST server)
+  * Push notifications: WebSocket (Java-WebSocket v1.3.0)
+  * Charts:             Rechart (v1.4.1) (charts for React.js)
+  * Front-end tests:    Selenium (Java) (3.4.0)
 
 Relevant projects:
   * front-end: "Trading Dashboard":
 
   <https://github.com/dmi3aleks/React/tree/master/dashboard>
 
-  * front-end tests:
+  * front-end and REST API tests:
 
   <https://github.com/dmi3aleks/WebAppTester>
 
