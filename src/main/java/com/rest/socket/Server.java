@@ -13,30 +13,36 @@ import java.util.*;
 
 public class Server extends WebSocketServer {
 
+    private static Server instance;
+
+    public static Server getInstance() {
+        if(instance == null) {
+            instance = new Server(7888);
+        }
+        return instance;
+    }
+
     private Set<WebSocket> connections;
-    private Set<WebSocket> subscribers;
+    // maps subjects to subscribers
+    private Map<String, Set<WebSocket>> subscribers;
+    private Map<String, String> subjectData;
 
     public Server(int port) {
         super(new InetSocketAddress(port));
         connections = new HashSet<>();
-        subscribers = new HashSet<>();
-        log(String.format("Starting a server at port: %d", port));
+        subscribers = new HashMap<>();
+        subjectData = new HashMap<>();
+    }
 
-        Timer timer = new Timer();
-        List<WebSocket> subscribersToBeDiscontinued = new LinkedList<>();
-        timer.scheduleAtFixedRate(new TimerTask() { public void run() {
-                subscribers.forEach(subscriber -> {
-                    try {
-                        subscriber.send("[UPDATE] " + getCurrentTimestamp());
-                    } catch (Throwable e) {
-                        log("Could not send an update to client: " +
-                                subscriber.getRemoteSocketAddress().getHostName());
-                        // unsubscribe implicitly
-                        subscribersToBeDiscontinued.add(subscriber);
-                    }
-                });
-                subscribersToBeDiscontinued.forEach(s -> subscribers.remove(s));;
-        }}, 0,3000);
+    @Override
+    public void start() {
+        log(String.format("Starting a server at port: %d", super.getPort()));
+        super.start();
+    }
+
+    public void updateSubject(final String subject, final String data) {
+        subjectData.put(subject, data);
+        pushUpdate(subject);
     }
 
     @Override
@@ -65,12 +71,12 @@ public class Server extends WebSocketServer {
 
             switch(message.getType()) {
                 case SUBSCRIBE:
-                    log("User subscribed");
-                    subscribers.add(webSocket);
+                    log("A new user has subscribed");
+                    subscribe(message.getSubject(), webSocket);
                 break;
                 case UNSUBSCRIBE:
-                    log("User unsubscribed");
-                    subscribers.remove(webSocket);
+                    log("A user has unsubscribed");
+                    unsubscribe(message.getSubject(), webSocket);
                 break;
             }
         } catch (IOException e) {
@@ -81,6 +87,42 @@ public class Server extends WebSocketServer {
     @Override
     public void onError(WebSocket webSocket, Exception e) {
         log("[ERROR] " + e.getMessage());
+    }
+
+
+    private void pushUpdate(final String subject) {
+        if(!subscribers.containsKey(subject)) {
+            return;
+        }
+
+        List<WebSocket> subscribersToBeDiscontinued = new LinkedList<>();
+
+        subscribers.get(subject).forEach(subscriber -> {
+            try {
+                subscriber.send(subjectData.get(subject));
+            } catch (Throwable e) {
+                log("Could not send an update to the client");
+                // unsubscribe implicitly
+                subscribersToBeDiscontinued.add(subscriber);
+            }
+        });
+        subscribersToBeDiscontinued.forEach(s -> unsubscribe(subject, s));
+    }
+
+    private void unsubscribe(final String subject, final WebSocket subscriber) {
+        if(!subscribers.containsKey(subject) ||
+           !subscribers.get(subject).contains(subscriber)) {
+            return;
+        }
+        subscribers.get(subject).remove(subscriber);
+    }
+
+    private void subscribe(final String subject, final WebSocket subscriber) {
+        if(subscribers.containsKey(subject)) {
+            subscribers.get(subject).add(subscriber);
+        } else {
+            subscribers.put(subject, new HashSet<>(Arrays.asList(subscriber)));
+        }
     }
 
     static void log(final String msg) {
