@@ -13,7 +13,9 @@ public class OrderQueue {
     }
 
     public void deleteOrder(final Orders ord) {
-        queue.remove(ord);
+        if(queue.contains(ord)) {
+            queue.remove(ord);
+        }
     }
 
     public Orders getHighestPriorityOrder() {

@@ -99,7 +99,9 @@ public class MatchingEngine {
 
     public void cancelOrder(Orders ord) {
         ord.setStatus("C");
-        queues.get(ord.getSelfKey()).deleteOrder(ord);
+        if(queues.containsKey(ord.getSelfKey())) {
+            queues.get(ord.getSelfKey()).deleteOrder(ord);
+        }
         OrderManager.updateOrder(ord);
     }
 
