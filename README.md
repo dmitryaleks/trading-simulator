@@ -345,6 +345,23 @@ Check the latest value in the sequence used for a serial key:
 SELECT last_value FROM orders_order_id_seq;
 ```
 
+### Export and Import database
+
+#### To export schema and data
+
+```
+pg_dump -U postgres -h localhost db >> db.sql
+```
+
+Sample export file:
+<https://github.com/dmi3aleks/RESTServer/blob/master/db/db.sql>
+
+#### To import schema and data
+
+```
+psql -U postgres db < db.sql
+```
+
 ## Notes on Hibernate
 
 ### Setup with Maven
