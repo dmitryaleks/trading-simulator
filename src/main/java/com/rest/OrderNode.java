@@ -68,7 +68,6 @@ public class OrderNode {
 
         Orders ord = new Orders(1, instID, side, price, quantity, notes);
         MatchingEngine.getInstance().addOrder(ord);
-        Server.getInstance().updateSubject("ORDERS", "ORDER POSTED");
 
         return Response.status(200).entity(ord.getJSON().toString()).build();
     }
@@ -93,7 +92,6 @@ public class OrderNode {
         try {
             ord = OrderManager.getOrder(orderID);
             MatchingEngine.getInstance().cancelOrder(ord);
-            Server.getInstance().updateSubject("ORDERS", "ORDER DELETED");
         } catch (OrderManager.OrderLookupException e) {
             e.printStackTrace();
         }

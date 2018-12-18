@@ -55,7 +55,6 @@ public class TradeManager {
             return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());
 
         } catch (InstrumentManager.InstrumentLookupException e) {
-            e.printStackTrace();
             throw new TradeLookupException(String.format("Unknown instrument"));
         }
     }

@@ -28,7 +28,6 @@ public class TradeNode {
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();
         } catch (final TradeManager.TradeLookupException ex) {
-            ex.printStackTrace();
         }
         return Response.status(210).entity("No orders found").build();
     }
@@ -45,7 +44,6 @@ public class TradeNode {
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();
         } catch (final TradeManager.TradeLookupException ex) {
-            ex.printStackTrace();
         }
         return Response.status(210).build();
     }

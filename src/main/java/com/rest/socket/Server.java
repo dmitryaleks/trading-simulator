@@ -81,7 +81,6 @@ public class Server extends WebSocketServer {
             }
         } catch (IOException e) {
         }
-
     }
 
     @Override

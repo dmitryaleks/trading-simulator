@@ -17,7 +17,7 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * REST API tests:     REST Assured (Java) (3.2.0)
   * Build management:   Maven (3.3.3)
   * Front-end:          React.js (15) + Axios (to fetch data from the REST server)
-  * Push notifications: WebSocket (Java-WebSocket v1.3.0)
+  * Push notifications: WebSocket (Java-WebSocket v1.3.0) + PostgreSQL NOTIFY table trigger and PG-JDBC-NG (0.7.1) Driver based listener in Java.
   * Charts:             Recharts (v1.4.1) (charts for React.js)
   * Front-end tests:    Selenium (Java) (3.4.0)
 
@@ -719,7 +719,7 @@ Any entity instance in your application appears in one of the three main states 
   * load    - creates a proxy object that can be used to establish a relationship with other records without selecting data from DBMS (E.g. when commiting a relation b/w records).
   * evict   - transitions the passed object from persistent to detached state.
 
-## Notes on WebSockets
+## Notes on WebSocket
 
 WebSocket is a communications protocol, providing full-duplex communication channels over a single TCP connection.
 
@@ -1028,5 +1028,144 @@ public void onMessage(WebSocket webSocket, String msg) {
 		}
 	} catch (IOException e) {
 	}
+}
+```
+
+## Notes on PostgreSQL push notifications with LISTEN/NOTIFY
+
+PostgreSQL supports push notifications. This feature is facilitated with LISTEN/NOTIFY commands.
+
+### Server-side setup (DBMS)
+
+DBMS needs to be instructed to issue push notifications upon certain updates on certain tables.
+
+#### Defining a Stored Procedure for pushing an update
+
+```sql
+CREATE OR REPLACE FUNCTION push_change() RETURNS TRIGGER AS $$
+    BEGIN
+        PERFORM pg_notify('update_queue', TG_TABLE_NAME);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+```
+
+#### Setting up a trigger on a table of interest
+
+```sql
+CREATE TRIGGER table_change
+    AFTER INSERT OR UPDATE OR DELETE ON orders
+    FOR EACH ROW EXECUTE PROCEDURE push_change();
+```
+
+#### Testing from psql
+
+Client needs to listen to the update queue:
+
+```
+listen "update_queue";
+
+INSERT INTO orders (timestamp, version, inst_id, price, quantity, notes, fill_price, quantity_filled, side, status) VALUES (CURRENT_TIMESTAMP, 1, 2, 7800, 10000, 'Direct order', 0, 0, 'S', 'A');
+INSERT 0 1
+
+Asynchronous notification "update_queue" with payload "orders" received from server process with PID 7322.
+```
+
+#### Note on notification delivery mechanism
+
+Client gets a notification whenever it runs something on the server.
+
+So if some other client has triggered a notification, this notification will be picked up from the queue only when client executed some other command.
+
+### Client side setup
+
+Standard JDBC driver does not supprt polling-free listening for PostgreSQL notifications.
+
+PG-JDBC-NG driver has such a support.
+
+#### Maven dependency
+
+```
+<dependency>
+	<groupId>com.impossibl.pgjdbc-ng</groupId>
+	<artifactId>pgjdbc-ng</artifactId>
+	<version>0.7.1</version>
+</dependency>
+```
+
+#### Client (Java) listening to notifications and distributing them to subscribers
+
+```java
+package com.rest.updatequeue;
+
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
+import com.rest.util.log.Logger;
+
+import java.sql.Statement;
+import java.util.*;
+
+public class UpdateQueueDaemon {
+
+    public interface UpdateQueueListener {
+        void update();
+    }
+
+    private Map<String, Set<UpdateQueueListener>> listeners = new HashMap<>();
+
+    private PGConnection connection;
+
+    private PGNotificationListener listener = new PGNotificationListener() {
+
+        @Override
+        public void notification(int processId, String channelName, String subject) {
+            Logger.log("UpdateQueueDaemon", String.format("Update on subject [%s] on channel [%s]", subject, channelName));
+            pushNotification(subject);
+        }
+    };
+
+    public UpdateQueueDaemon() {
+
+        Logger.log("UpdateQueueDaemon", "Watching the Update Queue");
+
+        PGDataSource dataSource = new PGDataSource();
+        dataSource.setHost("localhost");
+        dataSource.setPort(5432);
+        dataSource.setDatabase("db");
+        dataSource.setUser("app");
+
+        try {
+            connection = (PGConnection) dataSource.getConnection();
+            connection.addNotificationListener(listener);
+            Statement statement = connection.createStatement();
+            statement.execute("LISTEN \"update_queue\";");
+            statement.close();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    public void addListener(final String subject, final UpdateQueueListener listener) {
+        if(listeners.containsKey(subject)) {
+            listeners.get(subject).add(listener);
+        } else {
+            listeners.put(subject, new HashSet<>(Arrays.asList(listener)));
+        }
+    }
+
+    public void removeListener(final String subject, final UpdateQueueListener listener) {
+        if(!listeners.containsKey(subject) ||
+           !listeners.get(subject).contains(listener)) {
+            return;
+        }
+        listeners.get(subject).remove(listener);
+    }
+
+    private void pushNotification(final String subject) {
+        if(listeners.containsKey(subject)) {
+            listeners.get(subject).forEach(lsn -> lsn.update());
+        }
+    }
 }
 ```
