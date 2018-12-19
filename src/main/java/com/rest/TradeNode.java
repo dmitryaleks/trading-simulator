@@ -20,10 +20,10 @@ public class TradeNode {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllTrades() {
+    public Response getAllTrades(@DefaultValue("1000000000") @QueryParam("limit") Integer limit) {
 
         try {
-            List<JSONObject> orders = TradeManager.getAllTrades();
+            List<JSONObject> orders = TradeManager.getAllTrades(limit);
             JSONArray res = new JSONArray();
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();
@@ -35,11 +35,12 @@ public class TradeNode {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/byInstr")
-    public Response getTrades(@DefaultValue("6758.T") @QueryParam("instCode") String instCode) {
-        // http://localhost:8080/trade/byInstr?instCode=6758.T
+    public Response getTrades(@DefaultValue("6758.T") @QueryParam("instCode") String instCode,
+                              @DefaultValue("1000000000") @QueryParam("limit") Integer limit) {
+        // http://localhost:8080/trade/byInstr?instCode=6758.T&limit=10
 
         try {
-            List<JSONObject> orders = TradeManager.getTrades(instCode);
+            List<JSONObject> orders = TradeManager.getTrades(instCode, limit);
             JSONArray res = new JSONArray();
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();

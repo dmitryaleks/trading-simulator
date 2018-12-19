@@ -24,10 +24,10 @@ public class OrderNode {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@DefaultValue("6758.T") @QueryParam("instCode") String instCode) {
+    public Response get(@DefaultValue("1000000000") @QueryParam("limit") Integer limit) {
 
         try {
-            List<JSONObject> orders = OrderManager.getAllOrdersJSON();
+            List<JSONObject> orders = OrderManager.getAllOrdersJSON(limit);
             JSONArray res = new JSONArray();
             orders.stream().forEach(ord -> res.put(ord));
             return Response.status(200).entity(res.toString()).build();

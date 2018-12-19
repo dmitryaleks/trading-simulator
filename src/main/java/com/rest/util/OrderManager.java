@@ -9,6 +9,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,11 +52,12 @@ public class OrderManager {
         return orders;
     }
 
-    public static List<JSONObject> getAllOrdersJSON() throws OrderLookupException {
+    public static List<JSONObject> getAllOrdersJSON(int limit) throws OrderLookupException {
 
         Session session = SessionManager.getSessionFactory().openSession();
-        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.order_id");
+        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.timestamp DESC");
         Query query = session.createQuery(getInstrHQL);
+        query.setMaxResults(limit);
         List<Object[]> res = query.list();
         session.close();
         if(res.size() == 0) {
@@ -107,6 +109,7 @@ public class OrderManager {
     }
 
     public static void updateOrder(final Orders ord) {
+        ord.setTimestamp(new Date(new java.util.Date().getTime()));
         Session session = SessionManager.getSessionFactory().openSession();
         session.beginTransaction();
         session.update(ord);

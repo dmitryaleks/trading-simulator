@@ -20,11 +20,12 @@ public class TradeManager {
         }
     }
 
-    public static List<JSONObject> getAllTrades() throws TradeLookupException {
+    public static List<JSONObject> getAllTrades(final Integer limit) throws TradeLookupException {
 
         Session session = SessionManager.getSessionFactory().openSession();
-        final String getInstrHQL = String.format("SELECT T FROM Trade T ORDER BY T.trade_id");
+        final String getInstrHQL = String.format("SELECT T FROM Trade T ORDER BY T.timestamp DESC");
         Query query = session.createQuery(getInstrHQL);
+        query.setMaxResults(limit);
         List<Trade> trades = query.list();
         session.close();
         if(trades.size() == 0) {
@@ -34,13 +35,14 @@ public class TradeManager {
         return trades.stream().map(t -> t.getJSON()).collect(Collectors.toList());
     }
 
-    public static List<JSONObject> getTrades(final String instrCode) throws TradeLookupException {
+    public static List<JSONObject> getTrades(final String instrCode, final Integer limit) throws TradeLookupException {
 
         try {
             final int instrID = InstrumentManager.getInstrument(instrCode).getInstrument_id();
             Session session = SessionManager.getSessionFactory().openSession();
-            final String getInstrHQL = String.format("SELECT T, O FROM Trade T, Orders O WHERE O.order_id = T.resting_order_id ORDER BY T.trade_id");
+            final String getInstrHQL = String.format("SELECT T, O FROM Trade T, Orders O WHERE O.order_id = T.resting_order_id ORDER BY T.timestamp DESC");
             Query query = session.createQuery(getInstrHQL);
+            query.setMaxResults(limit);
             List<Object[]> res = query.list();
             session.close();
 
