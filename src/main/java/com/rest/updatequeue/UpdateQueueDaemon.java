@@ -4,6 +4,8 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import com.rest.util.log.Logger;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.sql.Statement;
 import java.util.*;
@@ -32,10 +34,21 @@ public class UpdateQueueDaemon {
         Logger.log("UpdateQueueDaemon", "Watching the Update Queue");
 
         PGDataSource dataSource = new PGDataSource();
-        dataSource.setHost("localhost");
-        dataSource.setPort(5432);
-        dataSource.setDatabase("db");
-        dataSource.setUser("app");
+
+        try
+        {
+            PropertiesConfiguration config = new PropertiesConfiguration("database.properties");
+            dataSource.setHost(config.getString("database.host"));
+            dataSource.setPort(config.getInt("database.port"));
+            dataSource.setDatabase(config.getString("database.name"));
+            dataSource.setUser(config.getString("database.username"));
+            dataSource.setPassword(config.getString("database.password"));
+        }
+        catch (ConfigurationException cex)
+        {
+            cex.printStackTrace();
+            // Something went wrong
+        }
 
         try {
             connection = (PGConnection) dataSource.getConnection();

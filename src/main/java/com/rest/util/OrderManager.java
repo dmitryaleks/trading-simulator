@@ -109,7 +109,6 @@ public class OrderManager {
     }
 
     public static void updateOrder(final Orders ord) {
-        ord.setTimestamp(new Date(new java.util.Date().getTime()));
         Session session = SessionManager.getSessionFactory().openSession();
         session.beginTransaction();
         session.update(ord);

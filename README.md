@@ -12,6 +12,7 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * ORM:                Hibernate (4.2.15)
   * REST Server:        Jersey (2.23.2)
   * JSON processor:     Jackson (Java) (2.9.2)
+  * Back-end config:    Apache Commons Configuration (1.6)
   * Web Server:         Tomcat (v8.0.44)
   * Back-end tests:     JUnit (4.12)
   * REST API tests:     REST Assured (Java) (3.2.0)
@@ -1185,4 +1186,63 @@ public class UpdateQueueDaemon {
         }
     }
 }
+```
+
+## Notes on Apache Commons Configuration (1.6)
+
+### Maven dependency
+
+```
+<dependency>
+	<groupId>commons-configuration</groupId>
+	<artifactId>commons-configuration</artifactId>
+	<version>1.6</version>
+</dependency>
+```
+
+### Configuration file
+
+File location:
+```
+src/main/resources/database.properties
+```
+
+```
+database.host = db.cahomxxoj8ew.ap-northeast-1.rds.amazonaws.com
+database.port = 5432
+database.name = jupiter
+database.username = master
+database.password = ********
+```
+
+### Usage
+
+```java
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+PropertiesConfiguration config = new PropertiesConfiguration("database.properties");
+dataSource.setHost(config.getString("database.host"));
+dataSource.setPort(config.getInt("database.port"));
+dataSource.setDatabase(config.getString("database.name"));
+dataSource.setUser(config.getString("database.username"));
+dataSource.setPassword(config.getString("database.password"));
+```
+
+## Notes on AWS RDS
+
+RDS allows running a PostgreSQL instance in the AWS cloud.
+
+### Connection URL:
+
+<jdbc:postgresql://db.cahomxxoj8ew.ap-northeast-1.rds.amazonaws.com/jupiter>
+
+### Basic operations can be done via the SQL Workbench
+
+<https://aws.amazon.com/getting-started/tutorials/create-connect-postgresql-db>
+
+### Administration can be done via a remote connection with psql
+
+```
+psql --host=db.cahomxxoj8ew.ap-northeast-1.rds.amazonaws.com --port=5432 --username=master --password --dbname=jupiter
 ```
