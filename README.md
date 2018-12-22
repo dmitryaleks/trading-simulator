@@ -1246,3 +1246,96 @@ RDS allows running a PostgreSQL instance in the AWS cloud.
 ```
 psql --host=db.cahomxxoj8ew.ap-northeast-1.rds.amazonaws.com --port=5432 --username=master --password --dbname=jupiter
 ```
+
+## Notes on AWS EC2
+
+AWS EC2 allows running a virtual server in the Amazon Cloud.
+
+### Connecting to the running instance
+
+```
+ssh -i ~/keys/Master.pem ec2-user@ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com
+```
+
+### Install JDK 8
+
+```
+sudo mkdir -p /usr/java
+cd /usr/java
+
+sudo wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+
+sudo yum install jdk-8u131-linux-x64.rpm
+```
+
+### Install and start Apache Tomcat
+
+Download the package:
+```
+sudo wget "https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.37/bin/apache-tomcat-8.5.37.tar.gz"
+
+sudo tar xvfz apache-tomcat-8.5.37.tar.gz
+```
+
+Start Tomcat server:
+```
+sudo su
+cd apache-tomcat-8.5.37/bin
+./startup.sh
+
+# verify that Tomcat is listening on port 8080
+lsof -i :8080
+```
+
+Allow connections from outside:
+
+```
+vim /usr/java/apache-tomcat-8.5.37/webapps/manager/META-INF/context.txt
+
+# comment out connection restriction statement:
+
+<!--Valve className="org.apache.catalina.valves.RemoteAddrValve"
+       allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /-->
+```
+
+Open port 8080 in the AWS Security Group firewall:
+
+```
+Go to the instance Secutiry Group:
+<https://ap-northeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#SecurityGroups:search=sg-09e6525d86fa8b525;sort=groupId>
+
+Select "Inbound" rules and add a Custom TCP Rule for port 8080.
+```
+
+Tomcat can now be accessed from outisde:
+<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080>
+
+Create admin credentials:
+
+```
+vim /usr/java/apache-tomcat-8.5.37/conf/tomcat-users.xml
+
+# add a "manager-gui" role and new user credentials:
+
+<role rolename="manager-gui"/>
+<user username="admin" password="********" roles="manager-gui"/>
+```
+
+Login to the Management console:
+<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/manager/html>
+
+Deploy a WAR file using the "WAR file to deploy" form.
+
+Allow connections from AWS EC2 to AWS RDS:
+
+```
+In the Security Group console:
+<https://ap-northeast-1.console.aws.amazon.com/vpc/home?region=ap-northeast-1#SecurityGroups:sort=groupId>
+
+Create new Inbound rules for RDS Secutiry Groups(s), allowing PostgreSQL access from security group corresponding to EC2 virtual machine:
+sg-09e6525d86fa8b525
+```
+
+Access resulting application:
+<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/order>
+<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/trade>
