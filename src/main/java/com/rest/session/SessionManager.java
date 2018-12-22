@@ -14,12 +14,12 @@ public class SessionManager {
     public static SessionFactory getSessionFactory() {
 
         try {
-            PropertiesConfiguration config = new PropertiesConfiguration("database.properties");
-            Properties props = new Properties();
-            props.setProperty("hibernate.connection.password", config.getString("database.password"));
-            props.setProperty("hibernate.connection.username", config.getString("database.username"));
-            props.setProperty("hibernate.connection.url", "jdbc:postgresql://" + config.getString("database.host") + "/" + config.getString("database.name"));
             if (sessionFactory == null) {
+                PropertiesConfiguration config = new PropertiesConfiguration("database.properties");
+                Properties props = new Properties();
+                props.setProperty("hibernate.connection.password", config.getString("database.password"));
+                props.setProperty("hibernate.connection.username", config.getString("database.username"));
+                props.setProperty("hibernate.connection.url", "jdbc:postgresql://" + config.getString("database.host") + "/" + config.getString("database.name"));
                 sessionFactory = new Configuration().addProperties(props).configure()
                         .buildSessionFactory();
             }
