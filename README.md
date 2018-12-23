@@ -1339,3 +1339,78 @@ sg-09e6525d86fa8b525
 Access resulting application:
 <http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/order>
 <http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/trade>
+
+## Notes on AWS S3
+
+S3 is a cloud storage. A unit of storage is called S3 bucket.
+
+### Create an S3 bucket
+
+Create a bucket using AWS Console.
+
+Configure bucket to serve a static website (use index.html as a default starting page).
+
+Configure bucket permission policy to enable public read access to files in the bucket:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowPublicRead",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::dashboard-alpha/*"
+        }
+    ]
+}
+```
+
+### Create an s3-admin user and generate access keys for it
+
+Create a new IAM user in AWS IAM menu.
+
+Generate access keys for it (save key ID and secret key).
+
+### Install AWS console command line client
+
+Install AWS CLI:
+```
+pip install awscli --upgrade --user
+```
+
+Configure AWS CLI by providing key ID and secret key:
+```
+aws configure
+```
+
+### Install npm package "react-deploy-s3"
+
+```
+npm install save react-deploy-s3
+```
+
+### Configure npm-managed React.js project to deploy production build to AWS S3
+
+Add "deploy" step to the package.json:
+```
+  "scripts": {
+    "start": "PORT=5000 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "s-test": "mocha test",
+    "predeploy": "npm run build",
+    "deploy": "aws s3 sync build/ s3://dashboard-alpha"
+  }
+```
+
+### Push build to S3
+
+```
+npm run deploy
+```
+
+### Access site via AWS S3
+
+<http://dashboard-alpha.s3-website-ap-northeast-1.amazonaws.com>
