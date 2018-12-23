@@ -1370,6 +1370,8 @@ Configure bucket permission policy to enable public read access to files in the 
 
 Create a new IAM user in AWS IAM menu.
 
+Grant Full S3 Access permissions to this user.
+
 Generate access keys for it (save key ID and secret key).
 
 ### Install AWS console command line client
@@ -1414,3 +1416,37 @@ npm run deploy
 ### Access site via AWS S3
 
 <http://dashboard-alpha.s3-website-ap-northeast-1.amazonaws.com>
+
+## AWS Route 53
+
+Below is how to use Route 53 to route traffic from a registered domain to an S3-bucket-based website.
+
+### Register a domain
+
+E.g.:
+
+```
+dmitryaleks.com
+```
+
+AWS will create a Hosted Zone automatically.
+
+### Deploy a site to a S3 bucket that follows the domain name convention:
+```
+trade.dmitryaleks.com
+```
+
+### Create a routing rule
+
+Under Hosted Zone, create a new Record Set.
+
+Name a new Record Set in such a way that the target S3 bucket has the name "[RecordSetName].youdomain.com", E.g.:
+```
+trade.dmitryaleks.com
+```
+
+Enable Record Set and test it.
+
+### Resulting site can be accessed at:
+
+<http://trade.dmitryaleks.com>
