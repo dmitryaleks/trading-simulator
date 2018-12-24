@@ -55,7 +55,7 @@ public class OrderManager {
     public static List<JSONObject> getAllOrdersJSON(int limit) throws OrderLookupException {
 
         Session session = SessionManager.getSessionFactory().openSession();
-        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.timestamp DESC");
+        final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.order_id DESC");
         Query query = session.createQuery(getInstrHQL);
         query.setMaxResults(limit);
         List<Object[]> res = query.list();

@@ -71,15 +71,14 @@ public class Server extends WebSocketServer {
 
             switch(message.getType()) {
                 case SUBSCRIBE:
-                    log("A new user has subscribed");
                     subscribe(message.getSubject(), webSocket);
                 break;
                 case UNSUBSCRIBE:
-                    log("A user has unsubscribed");
                     unsubscribe(message.getSubject(), webSocket);
                 break;
             }
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -90,6 +89,7 @@ public class Server extends WebSocketServer {
 
 
     private void pushUpdate(final String subject) {
+
         if(!subscribers.containsKey(subject)) {
             return;
         }
@@ -98,6 +98,7 @@ public class Server extends WebSocketServer {
 
         subscribers.get(subject).forEach(subscriber -> {
             try {
+                log(String.format("Pushing update \"%s\" on subject %s", subjectData, subject));
                 subscriber.send(subjectData.get(subject));
             } catch (Throwable e) {
                 log("Could not send an update to the client");

@@ -15,6 +15,8 @@
         <!-- Print executed SQL to stdout -->
         <property name="show_sql">true</property>
 
+        <property name="hibernate.jdbc.batch_size">0</property>
+
         <!-- Drop and re-create all database on startup -->
         <!--property name="hibernate.hbm2ddl.auto">create-drop</property-->
 
