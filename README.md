@@ -1254,7 +1254,7 @@ AWS EC2 allows running a virtual server in the Amazon Cloud.
 ### Connecting to the running instance
 
 ```
-ssh -i ~/keys/Master.pem ec2-user@ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com
+ssh -i ~/keys/Master.pem ec2-user@ec2-3-112-67-173.ap-northeast-1.compute.amazonaws.com
 ```
 
 ### Install JDK 8
@@ -1308,7 +1308,7 @@ Select "Inbound" rules and add a Custom TCP Rule for port 8080.
 ```
 
 Tomcat can now be accessed from outisde:
-<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080>
+<http://ec2-3-112-67-173.ap-northeast-1.compute.amazonaws.com:8080>
 
 Create admin credentials:
 
@@ -1322,7 +1322,7 @@ vim /usr/java/apache-tomcat-8.5.37/conf/tomcat-users.xml
 ```
 
 Login to the Management console:
-<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/manager/html>
+<http://ec2-3-112-67-173.ap-northeast-1.compute.amazonaws.com:8080/manager/html>
 
 Deploy a WAR file using the "WAR file to deploy" form.
 
@@ -1337,8 +1337,56 @@ sg-09e6525d86fa8b525
 ```
 
 Access resulting application:
-<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/order>
-<http://ec2-52-69-225-97.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/trade>
+<http://ec2-3-112-67-173.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/order>
+<http://ec2-3-112-67-173.ap-northeast-1.compute.amazonaws.com:8080/RESTServer-1.0-SNAPSHOT/trade>
+
+### Make Tomcat start automatically when virtual machine instace boots
+
+Configure a tomcat script:
+
+```
+sudo vim /etc/init.d/tomcat
+```
+
+Put:
+```
+export CATALINA_HOME="/usr/java/apache-tomcat-8.5.37"
+ERROR=0
+case "$1" in
+ start)
+            echo $"Starting Tomcat"
+            sh $CATALINA_HOME/bin/startup.sh
+            ;;
+ stop)
+           echo $"Stopping Tomcat"
+           sh $CATALINA_HOME/bin/shutdown.sh
+           ;;
+ restart)
+           sh $CATALINA_HOME/bin/shutdown.sh
+           sh $CATALINA_HOME/bin/startup.sh
+            ;;
+ *)
+         echo $"Usage: $0 {start|stop|restart}"
+ exit 1
+ ;;
+esac
+
+exit $ERROR
+```
+
+Configure permisssions:
+```
+sudo chmod 755 tomcat
+```
+
+Create symlinks under /etc/rc.d/... so that Tomcat gets started/stopped upon system start/reboot:
+```
+sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc6.d/K26tomcat
+sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc0.d/K26tomcat
+sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc3.d/S81tomcat
+sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc2.d/S81tomcat
+sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc5.d/S81tomcat
+```
 
 ## Notes on AWS S3
 
@@ -1450,3 +1498,15 @@ Enable Record Set and test it.
 ### Resulting site can be accessed at:
 
 <http://trade.dmitryaleks.com>
+
+## Connect to the AWS EC2 instance from JuiceSSH from a mobile phone
+
+Create a dedicated AIM user with EC2 List permissions.
+
+Get Access ID and Secret Key for this user and set up an EC2 Profile in JuiceSSH app.
+
+Fetch EC2 instances using this newly created profile.
+
+Copy Master.pom for ec2-user to the mobile phone and use it to set up an identity for ec2-user.
+
+Connect to EC2 instance (E.g. to restart Apache Tomcat server).

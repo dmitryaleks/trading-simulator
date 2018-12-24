@@ -14,7 +14,7 @@ public class SessionManager {
     public static SessionFactory getSessionFactory() {
 
         try {
-            if (sessionFactory == null) {
+            if (sessionFactory == null || sessionFactory.isClosed()) {
                 PropertiesConfiguration config = new PropertiesConfiguration("database.properties");
                 Properties props = new Properties();
                 props.setProperty("hibernate.connection.password", config.getString("database.password"));

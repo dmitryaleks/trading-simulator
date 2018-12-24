@@ -7,8 +7,12 @@ import com.rest.util.log.Logger;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class UpdateQueueDaemon {
 
@@ -31,7 +35,22 @@ public class UpdateQueueDaemon {
 
     public UpdateQueueDaemon() {
 
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                if (connection != null && connection.isClosed()) {
+                   startConnection();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }, 0, 5000, TimeUnit.MILLISECONDS);
+
         Logger.log("UpdateQueueDaemon", "Watching the Update Queue");
+        startConnection();
+    }
+
+    private void startConnection() {
 
         PGDataSource dataSource = new PGDataSource();
 
