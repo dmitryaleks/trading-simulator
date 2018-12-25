@@ -21,6 +21,19 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * Push notifications: WebSocket (Java-WebSocket v1.3.0) + PostgreSQL NOTIFY table trigger and PG-JDBC-NG (0.7.1) Driver based listener in Java.
   * Charts:             Recharts (v1.4.1) (charts for React.js)
   * Front-end tests:    Selenium (Java) (3.4.0)
+  * Front-end build:     npm
+
+Cloud setup:
+
+  * RDBMS:              AWS RDS instance of PostgreSQL
+  * Web-server:         Tomcat running a RESTFull API server in AWS EC2 Instance of Amazon Linux;
+  * Front-end:          optimized React.js build hosted from AWS S3 bucket.
+  * test:               Maven driven REST Assured test running from a dedicated AWS EC2 instance.
+
+Deployment:
+
+  * frontend:           "npm run deploy" - automatically uploads an optimized build to AWS S3 bucket using AWS Command Line Interface;
+  * backend:            "mvn package" followed by WAR upload via Tomcat Management interface.
 
 Relevant projects:
   * front-end: "Trading Dashboard":
@@ -1535,3 +1548,24 @@ Fetch EC2 instances using this newly created profile.
 Copy Master.pom for ec2-user to the mobile phone and use it to set up an identity for ec2-user.
 
 Connect to EC2 instance (E.g. to restart Apache Tomcat server).
+
+## Notes on pgAdmin
+
+pgAdmin allows administration of PostgreSQL RDMS.
+
+### Setup
+
+Download sources (tar.gz) and build them locally with qmake and Python 2.
+
+Install Python dependencies (mostly Flask), E.g.:
+```
+sudo pip install flask
+```
+
+Start the server:
+```
+sudo python ~/pgadmin4-3.6/web/pgAdmin4.py
+```
+
+Navigate to the administration dashboard:
+<http://127.0.0.1:5050>
