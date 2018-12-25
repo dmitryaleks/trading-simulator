@@ -1499,6 +1499,31 @@ Enable Record Set and test it.
 
 <http://trade.dmitryaleks.com>
 
+## Route traffic from custom domain to an EC2 Instance to expose programmatic REST API HTTP endpoint over the Internet
+
+In the AWS EC2 console:
+  * assign Elastic IP to the existing EC2 Instance;
+
+In the AWS Route 53 console:
+  * select existing Hosted Zone and create a new Record Set pointing at the Elastic IP of the target EC2 Instance.
+
+Resulting URL:
+
+<http://simulator.dmitryaleks.com:8080>
+
+### Create a short Tomcat Context Path for the API endpoint
+
+Log into Tomcat Managememnt Console:
+<http://simulator.dmitryaleks.com:8080/manager/html>
+
+Define a nee Context Path, E.g.:
+  * Context Path: /api
+  * WAR or Directory URL: file:/usr/java/apache-tomcat-8.5.37/webapps/RESTServer-1.0-SNAPSHOT
+
+Resulting endpoint can be accessed at following URLs:
+<http://simulator.dmitryaleks.com:8080/api/order>
+<http://simulator.dmitryaleks.com:8080/api/trade>
+
 ## Connect to the AWS EC2 instance from JuiceSSH from a mobile phone
 
 Create a dedicated AIM user with EC2 List permissions.
