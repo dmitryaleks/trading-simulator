@@ -1270,7 +1270,7 @@ RDS allows running a PostgreSQL instance in the AWS cloud.
 psql --host=db.cahomxxoj8ew.ap-northeast-1.rds.amazonaws.com --port=5432 --username=master --password --dbname=jupiter
 ```
 
-## Notes on AWS EC2
+## Notes on AWS EC2 (Elastic Compute Cloud)
 
 AWS EC2 allows running a virtual server in the Amazon Cloud.
 
@@ -1487,6 +1487,52 @@ npm run deploy
 ### Access site via AWS S3
 
 <http://dashboard-alpha.s3-website-ap-northeast-1.amazonaws.com>
+
+## Push Maven artifacts to S3 bucket
+
+Add the following Maven build extension to pom.xml:
+
+```xml
+<build>
+	<extensions>
+		<extension>
+			<groupId>com.gkatzioura.maven.cloud</groupId>
+			<artifactId>s3-storage-wagon</artifactId>
+			<version>1.0</version>
+		</extension>
+	</extensions>
+</build>
+```
+
+Define distribution management rules:
+
+```
+<distributionManagement>
+	<snapshotRepository>
+		<id>my-repo-bucket-snapshot</id>
+		<url>s3://deployment-store/snapshot</url>
+	</snapshotRepository>
+	<repository>
+		<id>my-repo-bucket-release</id>
+		<url>s3://deployment-store/release</url>
+	</repository>
+</distributionManagement>
+```
+
+Trigger deployment:
+
+```
+mvn deploy -DAWS_DEFAULT_REGION=ap-northeast-1
+```
+
+Check resulting files in S3 bucket:
+
+```
+aws s3 ls s3://deployment-store/snapshot --recursive
+```
+
+#TODO further automation to pick up artifact from S3 bucket and deploy to EC2-based Tomcat server:
+<https://stackoverflow.com/questions/34786231/how-to-deploy-a-war-file-from-s3-to-aws-ec2>
 
 ## AWS Route 53
 
