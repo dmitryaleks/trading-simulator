@@ -44,6 +44,12 @@ Relevant projects:
 
   <https://github.com/dmi3aleks/WebAppTester>
 
+## Further development plans
+
+  * add logging with log4j (capture request type along with the starting and end point [Joda-Time lib] of each request being processed);
+  * add monitoring with Nagios: <https://www.suse.com/c/application-monitoring-made-easy-java-applications-using-nagios>;
+  * add automated deployment of the Maven built WAR file to the AWS EC2 Tomcat instance.
+
 ## Deployment of a Jersey based web app to a Tomcat web server
 
   * export an archived WAR from IntelliJ: configure artifact and build it;
@@ -1242,6 +1248,10 @@ dataSource.setUser(config.getString("database.username"));
 dataSource.setPassword(config.getString("database.password"));
 ```
 
+## Notes on AWS VPC
+
+Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define. You have complete control over your virtual networking environment, including selection of your own IP address range, creation of subnets, and configuration of route tables and network gateways. You can use both IPv4 and IPv6 in your VPC for secure and easy access to resources and applications.
+
 ## Notes on AWS RDS
 
 RDS allows running a PostgreSQL instance in the AWS cloud.
@@ -1314,7 +1324,7 @@ vim /usr/java/apache-tomcat-8.5.37/webapps/manager/META-INF/context.txt
 Open port 8080 in the AWS Security Group firewall:
 
 ```
-Go to the instance Secutiry Group:
+Go to the instance Security Group:
 <https://ap-northeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#SecurityGroups:search=sg-09e6525d86fa8b525;sort=groupId>
 
 Select "Inbound" rules and add a Custom TCP Rule for port 8080.
