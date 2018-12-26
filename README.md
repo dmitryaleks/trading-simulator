@@ -1,12 +1,16 @@
 # Trading Simulator
 
-Enables placing orders and getting trades generated based on order's price-time priority.
+Simulates continuous trading, enabling placing orders and getting trades generated based on order's price-time priority.
 
 Comes with programmatic REST API and a simple web front-end.
 
 ## Overall architecture
 
-Jersey based REST Server with Hibernate+PostgreSQL persistence.
+Jersey based RESTFull API Server backed by Hibernate/PostgreSQL data persistence layer.
+
+React.js based front-end that comminicates with the backend via RESTFull API and gets push notifications via WebSocket.
+
+### Technology stack
 
   * Database Engine:    PostgreSQL (9.5.7)
   * ORM:                Hibernate (4.2.15)
@@ -23,32 +27,51 @@ Jersey based REST Server with Hibernate+PostgreSQL persistence.
   * Front-end tests:    Selenium (Java) (3.4.0)
   * Front-end build:     npm
 
-Cloud setup:
+### Cloud setup
 
   * RDBMS:              AWS RDS instance of PostgreSQL
   * Web-server:         Tomcat running a RESTFull API server in AWS EC2 Instance of Amazon Linux;
   * Front-end:          optimized React.js build hosted from AWS S3 bucket.
   * test:               Maven driven REST Assured test running from a dedicated AWS EC2 instance.
+  * routing:            AWS Route 53 based routing for S3 bucket serving a React.js site and for the API endpoints residing in EC2 instance.
 
-Deployment:
+### Deployment
 
   * frontend:           "npm run deploy" - automatically uploads an optimized build to AWS S3 bucket using AWS Command Line Interface;
   * backend:            "mvn package" followed by WAR upload via Tomcat Management interface.
 
-Relevant projects:
+### Related code repositories
+
   * front-end: "Trading Dashboard":
 
   <https://github.com/dmi3aleks/React/tree/master/dashboard>
 
-  * front-end and REST API tests:
+  * integration tests for the front-end and REST API:
 
   <https://github.com/dmi3aleks/WebAppTester>
 
-## Further development plans
+### Live instances hosted in a public AWS cloud
 
+App front-end:
+
+<http://trade.dmitryaleks.com>
+
+API endpoints:
+
+<http://simulator.dmitryaleks.com:8080/api/order?limit=10>
+
+<http://simulator.dmitryaleks.com:8080/api/trade?limit=10>
+
+Tomcat Management Console:
+<http://simulator.dmitryaleks.com:8080/manager/html>
+
+### Further development plans
+
+  * return order ID in a response to order entry POST request;
   * add logging with log4j (capture request type along with the starting and end point [Joda-Time lib] of each request being processed);
   * add monitoring with Nagios: <https://www.suse.com/c/application-monitoring-made-easy-java-applications-using-nagios>;
-  * add automated deployment of the Maven built WAR file to the AWS EC2 Tomcat instance.
+  * add automated deployment of the Maven built WAR file to the AWS EC2 Tomcat instance;
+  * document REST API.
 
 ## Deployment of a Jersey based web app to a Tomcat web server
 
@@ -1411,7 +1434,7 @@ sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc2.d/S81tomcat
 sudo ln -s /etc/init.d/tomcat /etc/rc.d/rc5.d/S81tomcat
 ```
 
-## Notes on AWS S3
+## Notes on AWS S3 (Simple Storage Service)
 
 S3 is a cloud storage. A unit of storage is called S3 bucket.
 
