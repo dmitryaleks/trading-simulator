@@ -2,20 +2,11 @@
 
 Simulates continuous trading, enabling placing orders and getting trades generated based on order's price-time priority.
 
-Comes with programmatic REST API and a simple web front-end:
+Comes with programmatic REST API and a simple reactive web front-end:
 
-## Small View
-
-![Front-end view (mobile)](docs/img/TSD_small.gif)
-
-## Medium View
-
-![Front-end view (mobile)](docs/img/TSD_medium.gif)
-
-## Big View
+Below is the front end screen capture taken when orders are placed manually followed by a burst of orders entered by a programmatic integration test:
 
 ![Front-end view (mobile)](docs/img/TSD_big.gif)
-
  
 ## Overall architecture
 
