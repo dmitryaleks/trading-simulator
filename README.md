@@ -4,8 +4,8 @@ Simulates continuous trading, enabling placing orders and getting trades generat
 
 Comes with programmatic REST API and a simple web front-end:
 
-![alt text](https://raw.githubusercontent.com/dmi3aleks/TradingSimulator/blob/master/docs/img/TradingDashboardMain.jpg)
-
+![Front-end view (mobile)](TradingSimulator/docs/img/TradingDashboardMain.jpg)
+ 
 ## Overall architecture
 
 Jersey based RESTFull API Server backed by Hibernate/PostgreSQL data persistence layer.
