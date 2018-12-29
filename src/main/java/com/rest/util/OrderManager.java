@@ -37,22 +37,19 @@ public class OrderManager {
         return order;
     }
 
-    public static List<Orders> getAllOrders() throws OrderLookupException {
+    public static List<Orders> getAllOrders() {
 
         Session session = SessionManager.getSessionFactory().openSession();
         final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.order_id");
         Query query = session.createQuery(getInstrHQL);
         List<Object[]> res = query.list();
         session.close();
-        if(res.size() == 0) {
-            throw new OrderLookupException(String.format("No orders found"));
-        }
 
         List<Orders> orders = res.stream().map(elm -> (Orders)elm[0]).collect(Collectors.toList());
         return orders;
     }
 
-    public static List<JSONObject> getAllOrdersJSON(int limit) throws OrderLookupException {
+    public static List<JSONObject> getAllOrdersJSON(int limit) {
 
         Session session = SessionManager.getSessionFactory().openSession();
         final String getInstrHQL = String.format("SELECT O, I FROM Orders O, Instrument I WHERE I.instrument_id = O.inst_id ORDER BY O.order_id DESC");
@@ -60,9 +57,6 @@ public class OrderManager {
         query.setMaxResults(limit);
         List<Object[]> res = query.list();
         session.close();
-        if(res.size() == 0) {
-            throw new OrderLookupException(String.format("No orders found"));
-        }
 
         List<JSONObject> orders = new LinkedList<>();
         for(Object[] elem: res) {
