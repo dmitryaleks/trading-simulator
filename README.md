@@ -48,11 +48,11 @@ React.js based front-end that comminicates with the backend via RESTFull API and
 
   * front-end: "Trading Dashboard":
 
-  <https://github.com/dmi3aleks/React/tree/master/dashboard>
+  <https://github.com/dmitryaleks/React/tree/master/dashboard>
 
   * integration tests for the front-end and REST API:
 
-  <https://github.com/dmi3aleks/WebAppTester>
+  <https://github.com/dmitryaleks/TradingSimulatorTest>
 
 ### Live instances hosted in a public AWS cloud
 
@@ -72,18 +72,14 @@ Tomcat Management Console:
 
 ### Project Wiki
 
-<https://github.com/dmi3aleks/TradingSimulator/wiki>
+<https://github.com/dmitryaleks/TradingSimulator/wiki>
 
 #### Shortcuts:
 
 How to build this project:
 
-<https://github.com/dmi3aleks/TradingSimulator/wiki/Build>
+<https://github.com/dmitryaleks/TradingSimulator/wiki/Build>
 
 Technical notes:
 
-<https://github.com/dmi3aleks/TradingSimulator/wiki/Technical-Notes>
-
-REST API documentation:
-
-<https://github.com/dmi3aleks/TradingSimulator/wiki/API>
+<https://github.com/dmitryaleks/TradingSimulator/wiki/Technical-Notes>
