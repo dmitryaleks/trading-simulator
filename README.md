@@ -2,7 +2,7 @@
 
 Simulates continuous trading, enabling placing orders and getting trades generated based on order's price-time priority.
 
-Comes with programmatic REST API and a simple reactive web front-end:
+Comes with programmatic REST API and a simple reactive web front-end.
 
 Below is the front end screen capture taken when orders are placed manually followed by a burst of orders entered by a programmatic integration test:
 

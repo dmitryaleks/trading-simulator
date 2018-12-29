@@ -1,15 +1,18 @@
 #!/usr/bin/bash
 
+api_endpoint="http://localhost:8080/RESTServer-1.0-SNAPSHOT"
+echo "-------------------------------------------------------------------------"
+echo "API ENPOINT: $api_endpoint"
 echo "-------------------------------------------------------------------------"
 echo "--------------------- Before placing a new order ------------------------"
 echo "-------------------------------------------------------------------------"
-curl -H "Content-Type: application/json" --request GET http://localhost:8080/order
+curl -H "Content-Type: application/json" --request GET "$api_endpoint/order?limit=5"
 echo "-------------------------------------------------------------------------"
 echo "------------------------- Placing a new order ---------------------------"
 echo "-------------------------------------------------------------------------"
-curl -H "Content-Type: application/json" --request POST --data '{"price":"7808", "quantity":"12000", "notes":"order", "instCode":"6753.T"}' http://localhost:8080/order/add
+curl -H "Content-Type: application/json" --request POST --data '{"Price":"7808", "Quantity":"12000", "Notes":"order", "InstrCode":"6753.T", "Side":"S"}' "$api_endpoint/order/add"
 echo "-------------------------------------------------------------------------"
 echo "--------------------- After placing a new order -------------------------"
 echo "-------------------------------------------------------------------------"
-curl -H "Content-Type: application/json" --request GET http://localhost:8080/order
+curl -H "Content-Type: application/json" --request GET "$api_endpoint/order?limit=5"
 echo "-------------------------------------------------------------------------"
