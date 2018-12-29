@@ -27,14 +27,10 @@ public class MatchingEngine {
     public MatchingEngine() {
         System.out.println("MatchingEngine constructed");
         // load active orders from DB into "queues"
-        try {
-            List<Orders> existingOrders = OrderManager.getAllOrders();
-            List<Orders> activeOrders = existingOrders.stream().
-                    filter(ord -> ord.getStatus().equals("A")).collect(Collectors.toList());
-            activeOrders.forEach(ord -> enqueueOrder(ord));
-        } catch (OrderManager.OrderLookupException e) {
-            e.printStackTrace();
-        }
+        List<Orders> existingOrders = OrderManager.getAllOrders();
+        List<Orders> activeOrders = existingOrders.stream().
+                filter(ord -> ord.getStatus().equals("A")).collect(Collectors.toList());
+        activeOrders.forEach(ord -> enqueueOrder(ord));
     }
 
     public void addOrder(Orders ord) {
