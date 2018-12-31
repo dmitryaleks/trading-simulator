@@ -50,11 +50,11 @@ React.js based front-end that comminicates with the backend via RESTFull API and
 
   * front-end: "Trading Dashboard":
 
-  <https://github.com/dmitryaleks/React/tree/master/dashboard>
+  <https://github.com/dmitryaleks/trading-dashboard>
 
   * integration tests for the front-end and REST API:
 
-  <https://github.com/dmitryaleks/TradingSimulatorTest>
+  <https://github.com/dmitryaleks/trading-simulator>
 
 ### RESTfull API specification
 
