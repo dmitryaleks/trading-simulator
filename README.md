@@ -54,7 +54,7 @@ React.js based front-end that comminicates with the backend via RESTFull API and
 
   * integration tests for the front-end and REST API:
 
-  <https://github.com/dmitryaleks/trading-simulator>
+  <https://github.com/dmitryaleks/trading-simulator-test>
 
 ### RESTfull API specification
 
