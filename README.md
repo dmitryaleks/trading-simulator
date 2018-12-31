@@ -60,10 +60,16 @@ App front-end:
 
 <http://trade.dmitryaleks.com>
 
-API endpoints:
+API endpoint:
+
+<http://simulator.dmitryaleks.com:8080/api>
+
+API spec:
+[REST API specification](docs/api/APISPEC.md)
+
+Sample GET requests:
 
 <http://simulator.dmitryaleks.com:8080/api/order?limit=10>
-
 <http://simulator.dmitryaleks.com:8080/api/trade?limit=10>
 
 Tomcat Management Console:
