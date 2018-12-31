@@ -54,6 +54,10 @@ React.js based front-end that comminicates with the backend via RESTFull API and
 
   <https://github.com/dmitryaleks/TradingSimulatorTest>
 
+### RESTfull API specification
+
+[REST API specification](docs/api/APISPEC.md)
+
 ### Live instances hosted in a public AWS cloud
 
 App front-end:
@@ -64,13 +68,13 @@ API endpoint:
 
 <http://simulator.dmitryaleks.com:8080/api>
 
-API spec:
-[REST API specification](docs/api/APISPEC.md)
-
 Sample GET requests:
 
 <http://simulator.dmitryaleks.com:8080/api/order?limit=10>
+
 <http://simulator.dmitryaleks.com:8080/api/trade?limit=10>
+
+<http://simulator.dmitryaleks.com:8080/api/trade?instruments>
 
 Tomcat Management Console:
 
