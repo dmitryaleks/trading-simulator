@@ -1,5 +1,7 @@
 # Trading Simulator
 
+[![Build Status](https://travis-ci.com/dmitryaleks/TradingSimulator.svg?branch=master)](https://travis-ci.com/dmitryaleks/TradingSimulator)
+
 Simulates continuous trading, enabling placing orders and getting trades generated based on order's price-time priority.
 
 Comes with programmatic REST API and a simple reactive web front-end.
