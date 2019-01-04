@@ -1,6 +1,6 @@
 # Trading Simulator
 
-[![Build Status](https://travis-ci.com/dmitryaleks/TradingSimulator.svg?branch=master)](https://travis-ci.com/dmitryaleks/TradingSimulator)
+[![Build Status](https://travis-ci.com/dmitryaleks/trading-simulator.svg?branch=master)](https://travis-ci.com/dmitryaleks/trading-simulator)
 
 Simulates continuous trading, enabling placing orders and getting trades generated based on order's price-time priority.
 
