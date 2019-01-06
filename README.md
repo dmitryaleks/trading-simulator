@@ -8,7 +8,7 @@ Comes with programmatic REST API and a simple reactive web front-end.
 
 Below is the front end screen capture taken when orders are placed manually followed by a burst of orders entered by a programmatic integration test:
 
-![Front-end view (mobile)](docs/img/TSD_big.gif)
+![Front-end view (mobile)](docs/img/TSD_RandomWalk.gif)
  
 ## Overall architecture
 
